@@ -1,0 +1,21 @@
+services:
+  tokenviewer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${PORT:-8484}:8484"
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN is required}
+      DASHBOARD_TOKEN: ${DASHBOARD_TOKEN:-}
+      PORT: 8484
+      DB_PATH: /data/tokenviewer.db
+      WEB_DIST: /app/web
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8484/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s

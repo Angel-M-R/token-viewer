@@ -1,0 +1,29 @@
+## Verification
+
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm test`
+- Built CLI smoke:
+  - `XDG_CONFIG_HOME=<tmp> node apps/collector/dist/cli.js copilot status`
+  - returned `copilot no configurado`
+- Built-server quota smoke on port 8584:
+  - registered a machine
+  - `POST /api/v1/ingest-quota` accepted an old snapshot
+  - accepted a second snapshot after the 5 minute window
+  - returned `{accepted:false, reason:"duplicate"}` for an immediate duplicate
+  - `GET /api/v1/quota-snapshots?provider=copilot` returned one account, latest `percentUsed: 42`, and two series points
+- Docker runtime check:
+  - `docker build -f docker/Dockerfile -t docker-tokenviewer-phase4 .`
+  - container `/health` returned `{"ok":true}`
+  - container `/` returned `200`
+- Mocked local flow coverage:
+  - GitHub device-flow success, `authorization_pending`, `slow_down`, and `expired_token`
+  - collector `run` with Copilot token makes one mocked `copilot_internal/user` request and sends a quota snapshot without leaking the GitHub token
+  - collector without Copilot token omits the step silently
+  - collector against an old server returning 404 records a warning and continues
+- Deployment compatibility:
+  - new server is additive; old collectors never call `ingest-quota`
+  - new collector handles old-server 404 as best-effort
+- Documentation:
+  - added `apps/collector/README.md` with `copilot login/status/logout`
+  - did not edit `references/`

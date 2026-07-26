@@ -1,0 +1,25 @@
+## Verification
+
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm test`
+- Built-server smoke check on port 8584:
+  - `GET /` returned `200`
+  - seeded one record through machine registration + ingest
+  - `stats/summary?from=2026-07-05&to=2026-07-05` returned `requests: 1`
+  - `stats/heatmap?metric=requests&tz=Europe/Madrid` placed a `23:00` local record in matrix cell `[0][23]`
+  - `GET /api/v1/machines` returned `200` in no-dashboard-token mode
+- Docker runtime check:
+  - `docker build -f docker/Dockerfile -t docker-tokenviewer-phase3 .`
+  - container `/health` returned `{"ok":true}`
+  - container `/` returned `200`
+- Vite development proxy check:
+  - API server on `8484`
+  - Vite dev server on `5173`
+  - `GET http://localhost:5173/api/v1/stats/summary` returned `200 application/json`
+- Client transform benchmark with 183 days x 18 groups:
+  - 3,294 rows, 1,000 filter-transform iterations in 58 ms
+  - Approx. 0.058 ms per filter transform
+- Production web bundle:
+  - JS gzip size: 295.86 KB
+  - CSS gzip size: 1.95 KB
