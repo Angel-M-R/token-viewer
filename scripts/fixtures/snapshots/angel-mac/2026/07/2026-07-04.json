@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2026-07-04",
+  "generatedAt": "2026-07-05T00:05:00.000Z",
+  "usage": [
+    {
+      "hour": "2026-07-04T08:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4",
+      "requests": 2,
+      "inputTokens": 120,
+      "outputTokens": 40,
+      "reasoningTokens": 8,
+      "cacheReadTokens": 20,
+      "cacheWriteTokens": 10,
+      "estimatedCost": 0.004,
+      "billedCost": 0.003,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-07-04T09:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5",
+      "requests": 1,
+      "inputTokens": 80,
+      "outputTokens": 20,
+      "reasoningTokens": 4,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.002,
+      "billedCost": 0.002,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [
+    {
+      "provider": "copilot",
+      "takenAt": "2026-07-04T12:00:00.000Z",
+      "percentUsed": 35,
+      "plan": "Pro",
+      "resetsAt": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "totals": {
+    "requests": 3,
+    "inputTokens": 200,
+    "outputTokens": 60,
+    "reasoningTokens": 12,
+    "cacheReadTokens": 20,
+    "cacheWriteTokens": 10,
+    "estimatedCost": 0.006,
+    "billedCost": 0.005,
+    "unpricedRequests": 0
+  }
+}

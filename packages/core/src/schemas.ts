@@ -18,21 +18,6 @@ export const usageRecordSchema = z.object({
   recordHash: z.string().regex(/^[a-f0-9]{64}$/),
 });
 
-export const ingestPayloadSchema = z.object({
-  machineName: z.string().min(1),
-  machineToken: z.string().min(1),
-  records: z.array(usageRecordSchema).max(1000),
-});
-
-export const ingestRequestSchema = z.object({
-  records: z.array(usageRecordSchema).max(1000),
-});
-
-export const ingestResponseSchema = z.object({
-  accepted: z.number().int().nonnegative(),
-  duplicates: z.number().int().nonnegative(),
-});
-
 export const machineRegisterRequestSchema = z.object({
   name: z.string().min(1),
   os: z.string().min(1).optional(),
@@ -119,31 +104,13 @@ export const recordsResponseSchema = z.object({
   nextCursor: z.string().optional(),
 });
 
-export const quotaSnapshotSchema = z.object({
-  provider: z.string().min(1),
-  takenAt: z.string().datetime({ offset: true }),
-  percentUsed: z.number().finite().min(0).max(100).optional(),
-  plan: z.string().min(1).optional(),
-  resetsAt: z.string().datetime({ offset: true }).optional(),
-  raw: z.record(z.string(), z.unknown()),
-});
-
-export const quotaIngestRequestSchema = z.object({
-  snapshot: quotaSnapshotSchema,
-});
-
-export const quotaIngestResponseSchema = z.object({
-  accepted: z.boolean(),
-  reason: z.string().optional(),
-});
-
 export const quotaSnapshotSeriesPointSchema = z.object({
   takenAt: z.string(),
   percentUsed: z.number().finite().min(0).max(100).optional(),
 });
 
-export const quotaSnapshotAccountSchema = z.object({
-  account: z.string().min(1),
+export const quotaSnapshotGroupSchema = z.object({
+  machine: z.enum(["angel-mac", "old-mac"]),
   provider: z.string().min(1),
   latest: z.object({
     takenAt: z.string(),
@@ -156,13 +123,10 @@ export const quotaSnapshotAccountSchema = z.object({
 
 export const quotaSnapshotsResponseSchema = z.object({
   provider: z.string().min(1),
-  accounts: z.array(quotaSnapshotAccountSchema),
+  groups: z.array(quotaSnapshotGroupSchema),
 });
 
 export type UsageRecordInput = z.input<typeof usageRecordSchema>;
-export type IngestPayloadInput = z.input<typeof ingestPayloadSchema>;
-export type IngestRequestInput = z.input<typeof ingestRequestSchema>;
-export type IngestResponse = z.infer<typeof ingestResponseSchema>;
 export type MachineRegisterRequest = z.infer<typeof machineRegisterRequestSchema>;
 export type MachineRegisterResponse = z.infer<typeof machineRegisterResponseSchema>;
 export type MachineListItem = z.infer<typeof machineListItemSchema>;
@@ -171,8 +135,4 @@ export type StatsDailyResponse = z.infer<typeof statsDailyResponseSchema>;
 export type StatsHeatmapResponse = z.infer<typeof statsHeatmapResponseSchema>;
 export type StatsModelsResponse = z.infer<typeof statsModelsResponseSchema>;
 export type RecordsResponse = z.infer<typeof recordsResponseSchema>;
-export type QuotaSnapshotInput = z.input<typeof quotaSnapshotSchema>;
-export type QuotaSnapshot = z.infer<typeof quotaSnapshotSchema>;
-export type QuotaIngestRequestInput = z.input<typeof quotaIngestRequestSchema>;
-export type QuotaIngestResponse = z.infer<typeof quotaIngestResponseSchema>;
 export type QuotaSnapshotsResponse = z.infer<typeof quotaSnapshotsResponseSchema>;

@@ -1,13 +1,43 @@
 import type { Hono } from "hono";
-import {
-  quotaIngestRequestSchema,
-  quotaIngestResponseSchema,
-  quotaSnapshotsResponseSchema,
-} from "@tokenviewer/core";
+import { z } from "zod";
 import type { AppContext } from "../app.js";
 import { requireDashboard, resolveMachine } from "../auth.js";
 
 const DEDUP_WINDOW_MS = 5 * 60 * 1000;
+const legacyQuotaSnapshotSchema = z.object({
+  provider: z.string().min(1),
+  takenAt: z.string().datetime({ offset: true }),
+  percentUsed: z.number().finite().min(0).max(100).optional(),
+  plan: z.string().min(1).optional(),
+  resetsAt: z.string().datetime({ offset: true }).optional(),
+  raw: z.record(z.string(), z.unknown()),
+});
+const legacyQuotaIngestRequestSchema = z.object({ snapshot: legacyQuotaSnapshotSchema });
+const legacyQuotaIngestResponseSchema = z.object({
+  accepted: z.boolean(),
+  reason: z.string().optional(),
+});
+const legacyQuotaSnapshotsResponseSchema = z.object({
+  provider: z.string().min(1),
+  accounts: z.array(
+    z.object({
+      account: z.string().min(1),
+      provider: z.string().min(1),
+      latest: z.object({
+        takenAt: z.string(),
+        percentUsed: z.number().finite().min(0).max(100).optional(),
+        plan: z.string().nullable(),
+        resetsAt: z.string().nullable(),
+      }),
+      series: z.array(
+        z.object({
+          takenAt: z.string(),
+          percentUsed: z.number().finite().min(0).max(100).optional(),
+        }),
+      ),
+    }),
+  ),
+});
 
 export function registerQuotaRoutes(app: Hono, context: AppContext): void {
   app.post("/api/v1/ingest-quota", async (c) => {
@@ -16,7 +46,7 @@ export function registerQuotaRoutes(app: Hono, context: AppContext): void {
       return machine;
     }
 
-    const parsed = quotaIngestRequestSchema.safeParse(await c.req.json().catch(() => null));
+    const parsed = legacyQuotaIngestRequestSchema.safeParse(await c.req.json().catch(() => null));
     if (!parsed.success) {
       return c.json({ error: "invalid request", issues: parsed.error.issues }, 400);
     }
@@ -29,7 +59,7 @@ export function registerQuotaRoutes(app: Hono, context: AppContext): void {
       .get(machine.id, snapshot.provider) as { taken_at: string } | undefined;
     const latestTime = latest ? new Date(latest.taken_at).getTime() : 0;
     if (latest && Number.isFinite(latestTime) && Date.now() - latestTime < DEDUP_WINDOW_MS) {
-      return c.json(quotaIngestResponseSchema.parse({ accepted: false, reason: "duplicate" }));
+      return c.json(legacyQuotaIngestResponseSchema.parse({ accepted: false, reason: "duplicate" }));
     }
 
     context.db.sqlite
@@ -51,7 +81,7 @@ export function registerQuotaRoutes(app: Hono, context: AppContext): void {
       );
     context.db.sqlite.prepare("UPDATE machines SET last_seen_at = ? WHERE id = ?").run(new Date().toISOString(), machine.id);
 
-    return c.json(quotaIngestResponseSchema.parse({ accepted: true }));
+    return c.json(legacyQuotaIngestResponseSchema.parse({ accepted: true }));
   });
 
   app.get("/api/v1/quota-snapshots", (c) => {
@@ -135,7 +165,7 @@ export function registerQuotaRoutes(app: Hono, context: AppContext): void {
     }
 
     return c.json(
-      quotaSnapshotsResponseSchema.parse({
+      legacyQuotaSnapshotsResponseSchema.parse({
         provider,
         accounts: [...accounts.values()].map((account) => ({
           account: account.account,

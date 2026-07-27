@@ -2,132 +2,134 @@ import { mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { collectorStatePath } from "@tokenviewer/core";
+import { collectorStatePath, validateSnapshotSet, type PricingCatalog } from "@tokenviewer/core";
 import { saveCollectorConfig } from "../src/config.js";
 import { runCollector, statusCollector } from "../src/index.js";
+import { saveCollectorState } from "../src/state.js";
 
 const envBackup = { ...process.env };
+const PRICING: PricingCatalog = { source: "fallback" };
+const NOW = new Date("2026-07-05T12:00:00.000Z");
 
 afterEach(() => {
   vi.unstubAllGlobals();
   for (const key of Object.keys(process.env)) {
-    if (!(key in envBackup)) {
-      delete process.env[key];
-    }
+    if (!(key in envBackup)) delete process.env[key];
   }
   Object.assign(process.env, envBackup);
 });
 
-describe.sequential("collector dry-run", () => {
-  it.sequential("runs twice without reparsing confirmed files and does not write agent dirs", async () => {
-    const root = await mkdtemp(join(tmpdir(), "tv-e2e-"));
-    process.env.CLAUDE_CONFIG_DIR = join(root, "claude");
-    process.env.XDG_STATE_HOME = join(root, "state");
-    process.env.XDG_CONFIG_HOME = join(root, "config");
+describe.sequential("collector local snapshots", () => {
+  it.sequential("previews aggregate days without snapshots, state, Git, endpoints, or private records", async () => {
+    const root = await collectorRoot("tv-dry-");
+    const sourceFile = await writeClaudeRecord(root);
+    const fetcher = vi.fn();
 
-    const projectDir = join(process.env.CLAUDE_CONFIG_DIR, "projects", "project-a");
-    await import("node:fs/promises").then(({ mkdir }) => mkdir(projectDir, { recursive: true }));
-    const sourceFile = join(projectDir, "session.jsonl");
-    await writeFile(
-      sourceFile,
-      `${JSON.stringify({
-        type: "assistant",
-        requestId: "req-1",
-        timestamp: "2026-07-05T10:00:00.000Z",
-        message: {
-          id: "msg-1",
-          role: "assistant",
-          model: "claude-sonnet-4",
-          usage: { input_tokens: 3, output_tokens: 4 },
-        },
-      })}\n`,
-      "utf-8",
+    const summary = await runCollector(
+      { dryRun: true, agents: ["claude"] },
+      { pricing: PRICING, now: () => NOW, fetcher },
     );
-    const before = await stat(sourceFile);
 
-    const first = await runCollector({ dryRun: true, agents: ["claude"] });
-    expect(first.totals.records).toBe(1);
-    expect(first.agents.claude?.filesScanned).toBe(1);
+    expect(summary.sourceCoverage.dates).toEqual(["2026-07-05"]);
+    expect(summary.days).toMatchObject([{ date: "2026-07-05", rows: 1, requests: 1 }]);
+    expect(summary.totals).toMatchObject({ requests: 1, inputTokens: 3, outputTokens: 4 });
+    expect(JSON.stringify(summary)).not.toContain(sourceFile);
+    expect(JSON.stringify(summary)).not.toMatch(/req-1|msg-1|recordHash|session|project/);
+    await expect(stat(join(root, "snapshots"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(readFile(collectorStatePath(), "utf8")).rejects.toMatchObject({ code: "ENOENT" });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
 
-    const second = await runCollector({ dryRun: true, agents: ["claude"] });
-    expect(second.totals.records).toBe(0);
-    expect(second.agents.claude?.filesOmitted).toBe(1);
+  it.sequential("writes validated aggregates with one best-effort sanitized quota sample", async () => {
+    const root = await collectorRoot("tv-write-", "gho_secret");
+    await writeClaudeRecord(root);
+    const fetcher = vi.fn(async () =>
+      Response.json({
+        login: "octocat",
+        plan: "Pro",
+        resets_at: "2026-08-01T00:00:00Z",
+        quota_snapshots: { premium_requests: { percent_used: 51 } },
+        unknown: "discarded",
+      }),
+    );
 
-    const after = await stat(sourceFile);
-    expect(after.mtimeMs).toBe(before.mtimeMs);
+    const summary = await runCollector(
+      { dryRun: false, agents: ["claude"] },
+      { pricing: PRICING, now: () => NOW, fetcher },
+    );
+    const relativePath = "snapshots/angel-mac/2026/07/2026-07-05.json";
+    const snapshot = JSON.parse(await readFile(join(root, relativePath), "utf8")) as unknown;
 
-    const state = JSON.parse(await readFile(collectorStatePath(), "utf-8")) as {
-      files: Record<string, unknown>;
-      lastRunAt?: string;
-    };
-    expect(Object.keys(state.files)).toEqual([sourceFile]);
-    expect(state.lastRunAt).toBeTruthy();
+    expect(summary.writtenDates).toEqual(["2026-07-05"]);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(validateSnapshotSet([{ path: relativePath, value: snapshot }])[0]?.snapshot.quotaSamples).toEqual([
+      {
+        provider: "copilot",
+        takenAt: "2026-07-05T12:00:00.000Z",
+        percentUsed: 51,
+        plan: "Pro",
+        resetsAt: "2026-08-01T00:00:00.000Z",
+      },
+    ]);
+    expect(JSON.stringify(snapshot)).not.toMatch(/octocat|unknown|gho_secret|raw|login/);
+  });
+
+  it.sequential("reports identity, source and snapshot coverage, missing days, last run, and pending commit", async () => {
+    const root = await collectorRoot("tv-status-");
+    await writeClaudeRecord(root);
+    await saveCollectorState({
+      schemaVersion: 1,
+      files: {},
+      lastRunAt: "2026-07-06T00:00:00.000Z",
+      pendingPublicationCommit: "abc1234",
+    });
 
     const status = await statusCollector();
-    expect(status.cursorFiles).toBe(1);
-    expect(status.lastRunAt).toBeTruthy();
-  });
 
-  it.sequential("exports the same summary to --out", async () => {
-    const root = await mkdtemp(join(tmpdir(), "tv-out-"));
-    process.env.CLAUDE_CONFIG_DIR = join(root, "claude");
-    process.env.XDG_STATE_HOME = join(root, "state");
-    process.env.XDG_CONFIG_HOME = join(root, "config");
-    const out = join(root, "summary.json");
-
-    const summary = await runCollector({ dryRun: true, agents: ["claude"], out });
-    expect(JSON.parse(await readFile(out, "utf-8"))).toEqual(summary);
-  });
-
-  it.sequential("fails non-dry-run without config before touching cursors", async () => {
-    const root = await mkdtemp(join(tmpdir(), "tv-fail-"));
-    process.env.XDG_STATE_HOME = join(root, "state");
-
-    await expect(runCollector({ dryRun: false, agents: ["claude"] })).rejects.toThrow(
-      "serverUrl y machineToken son obligatorios",
-    );
-    await expect(readFile(collectorStatePath(), "utf-8")).rejects.toMatchObject({ code: "ENOENT" });
-  });
-
-  it.sequential("collects Copilot quota once during a configured server run", async () => {
-    const root = await mkdtemp(join(tmpdir(), "tv-copilot-run-"));
-    process.env.CLAUDE_CONFIG_DIR = join(root, "claude");
-    process.env.XDG_STATE_HOME = join(root, "state");
-    process.env.XDG_CONFIG_HOME = join(root, "config");
-    await saveCollectorConfig({
-      serverUrl: "http://server.local",
-      machineToken: "tv_machine",
-      copilotToken: "gho_secret",
-      machineName: "machine",
+    expect(status).toMatchObject({
+      identity: "angel-mac",
+      sourceCoverage: { dates: ["2026-07-05"], from: "2026-07-05", to: "2026-07-05" },
+      snapshotCoverage: { dates: [] },
+      missingDays: ["2026-07-05"],
+      lastRunAt: "2026-07-06T00:00:00.000Z",
+      pendingPublicationCommit: "abc1234",
     });
-
-    const quotaBodies: string[] = [];
-    const fetchMock = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
-      const target = String(url);
-      if (target.endsWith("/api/v1/ingest")) {
-        return Response.json({ accepted: 0, duplicates: 0 });
-      }
-      if (target === "https://api.github.com/copilot_internal/user") {
-        return Response.json({
-          login: "octocat",
-          plan: "Pro",
-          quota_snapshots: { premium_interactions: { percent_used: 51 } },
-        });
-      }
-      if (target.endsWith("/api/v1/ingest-quota")) {
-        quotaBodies.push(String(init?.body));
-        return Response.json({ accepted: true });
-      }
-      return new Response("unexpected", { status: 500 });
-    });
-    vi.stubGlobal("fetch", fetchMock);
-
-    const summary = await runCollector({ dryRun: false, agents: ["claude"] });
-
-    expect((summary as typeof summary & { quota?: { accepted: boolean } }).quota).toEqual({ accepted: true });
-    expect(fetchMock.mock.calls.filter(([url]) => String(url) === "https://api.github.com/copilot_internal/user")).toHaveLength(1);
-    expect(quotaBodies).toHaveLength(1);
-    expect(quotaBodies[0]).toContain("octocat");
-    expect(quotaBodies[0]).not.toContain("gho_secret");
+    expect(JSON.stringify(status)).not.toMatch(/gho_|sourceFile|recordHash/);
   });
 });
+
+async function collectorRoot(prefix: string, copilotToken?: string): Promise<string> {
+  const root = await mkdtemp(join(tmpdir(), prefix));
+  process.env.CLAUDE_CONFIG_DIR = join(root, "claude");
+  process.env.XDG_STATE_HOME = join(root, "state");
+  process.env.XDG_CONFIG_HOME = join(root, "config");
+  await saveCollectorConfig({
+    machineName: "angel-mac",
+    checkoutPath: root,
+    agents: ["claude"],
+    copilotToken,
+  });
+  return root;
+}
+
+async function writeClaudeRecord(root: string): Promise<string> {
+  const projectDir = join(root, "claude", "projects", "project-a");
+  await import("node:fs/promises").then(({ mkdir }) => mkdir(projectDir, { recursive: true }));
+  const sourceFile = join(projectDir, "session.jsonl");
+  await writeFile(
+    sourceFile,
+    `${JSON.stringify({
+      type: "assistant",
+      requestId: "req-1",
+      timestamp: "2026-07-05T10:00:00.000Z",
+      message: {
+        id: "msg-1",
+        role: "assistant",
+        model: "claude-sonnet-4",
+        usage: { input_tokens: 3, output_tokens: 4 },
+      },
+    })}\n`,
+    "utf8",
+  );
+  return sourceFile;
+}

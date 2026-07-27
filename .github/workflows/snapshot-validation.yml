@@ -1,0 +1,96 @@
+name: Snapshot and monorepo validation
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/snapshot-validation.yml"
+      - "apps/**"
+      - "ops/**"
+      - "package.json"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "scripts/**"
+      - "snapshots/**"
+      - "tsconfig*.json"
+  pull_request:
+    branches: [master]
+    paths:
+      - ".github/workflows/snapshot-validation.yml"
+      - "apps/**"
+      - "ops/**"
+      - "package.json"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "scripts/**"
+      - "snapshots/**"
+      - "tsconfig*.json"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      CI_HEAD_SHA: ${{ github.sha }}
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Protect snapshots from CI writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > "$RUNNER_TEMP/tokenviewer-ci-head"
+          if [[ -d snapshots ]]; then
+            chmod -R a-w snapshots
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Reject mixed-machine data publications
+        run: pnpm ci:check-snapshot-publication -- "$CI_BASE_SHA" "$CI_HEAD_SHA"
+
+      - name: Validate all snapshots and privacy invariants
+        run: pnpm validate:snapshots
+
+      - name: Validate sanitized two-machine fixtures
+        run: pnpm validate:snapshot-fixtures
+
+      - name: Check snapshot size and validation runtime budget
+        run: pnpm ci:check-snapshot-budget
+
+      - name: Run unit and integration tests
+        run: pnpm test
+
+      - name: Typecheck monorepo
+        run: pnpm typecheck
+
+      - name: Build applicable monorepo packages
+        run: pnpm build
+
+      - name: Verify CI did not rewrite or commit snapshots
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$(<"$RUNNER_TEMP/tokenviewer-ci-head")"
+          git diff --exit-code -- snapshots
+          test -z "$(git status --porcelain=v1 --untracked-files=all -- snapshots)"

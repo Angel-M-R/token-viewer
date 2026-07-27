@@ -20,6 +20,7 @@ export function parseFilters(search: string): DashboardFilters {
     to: params.get("to") || undefined,
     machines: params.getAll("machine").filter(Boolean),
     agents: params.getAll("agent").filter(Boolean),
+    providers: params.getAll("provider").filter(Boolean),
     models: params.getAll("model").filter(Boolean),
     heatmapMetric: enumValue(params.get("metric"), heatmapMetricValues, DEFAULT_FILTERS.heatmapMetric),
     dailyGroupBy: enumValue(params.get("groupBy"), dailyGroupValues, DEFAULT_FILTERS.dailyGroupBy),
@@ -38,6 +39,7 @@ export function serializeFilters(filters: DashboardFilters): string {
   }
   appendRepeated(params, "machine", filters.machines);
   appendRepeated(params, "agent", filters.agents);
+  appendRepeated(params, "provider", filters.providers);
   appendRepeated(params, "model", filters.models);
   if (filters.heatmapMetric !== DEFAULT_FILTERS.heatmapMetric) {
     params.set("metric", filters.heatmapMetric);
@@ -58,6 +60,7 @@ export function normalizeFilters(filters: DashboardFilters): DashboardFilters {
     to: filters.range === "custom" ? filters.to : undefined,
     machines: unique(filters.machines),
     agents: unique(filters.agents),
+    providers: unique(filters.providers),
     models: unique(filters.models),
   };
 }
@@ -77,4 +80,3 @@ function appendRepeated(params: URLSearchParams, key: string, values: string[]):
 function unique(values: string[]): string[] {
   return [...new Set(values.filter(Boolean))];
 }
-

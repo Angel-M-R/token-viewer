@@ -5,12 +5,24 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./schemas": {
-      "types": "./dist/schemas.d.ts",
+      "types": "./src/schemas.ts",
+      "development": "./src/schemas.ts",
       "import": "./dist/schemas.js"
+    },
+    "./snapshots": {
+      "types": "./src/snapshots.ts",
+      "development": "./src/snapshots.ts",
+      "import": "./dist/snapshots.js"
+    },
+    "./pricing": {
+      "types": "./src/pricing.ts",
+      "development": "./src/pricing.ts",
+      "import": "./dist/pricing.js"
     }
   },
   "scripts": {

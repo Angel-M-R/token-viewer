@@ -1,5 +1,5 @@
 import type { MachineListItem } from "@tokenviewer/core/schemas";
-import { CalendarDays, DollarSign, Hash, Layers3, Server, Sigma } from "lucide-react";
+import { Boxes, CalendarDays, DollarSign, Hash, Layers3, Server, Sigma } from "lucide-react";
 import { RANGE_LABELS } from "./presets";
 import type { DashboardFilters, HeatmapMetric, RangePreset } from "./types";
 
@@ -7,6 +7,7 @@ interface FilterBarProps {
   filters: DashboardFilters;
   machines: MachineListItem[];
   agents: string[];
+  providers: string[];
   models: string[];
   onChange: (patch: Partial<DashboardFilters>) => void;
 }
@@ -17,7 +18,7 @@ const heatmapMetrics: Array<{ value: HeatmapMetric; label: string; icon: typeof 
   { value: "requests", label: "Requests", icon: Hash },
 ];
 
-export function FilterBar({ filters, machines, agents, models, onChange }: FilterBarProps) {
+export function FilterBar({ filters, machines, agents, providers, models, onChange }: FilterBarProps) {
   return (
     <section className="filter-bar" aria-label="Global filters">
       <div className="filter-group filter-range">
@@ -67,6 +68,13 @@ export function FilterBar({ filters, machines, agents, models, onChange }: Filte
         values={filters.agents}
         options={agents}
         onChange={(agents) => onChange({ agents })}
+      />
+      <MultiSelect
+        icon={Boxes}
+        label="Providers"
+        values={filters.providers}
+        options={providers}
+        onChange={(providers) => onChange({ providers })}
       />
       <MultiSelect
         icon={Sigma}

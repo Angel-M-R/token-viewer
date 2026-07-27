@@ -110,7 +110,7 @@ h2 {
 
 .filter-bar {
   display: grid;
-  grid-template-columns: minmax(210px, 1.1fr) repeat(3, minmax(150px, 0.9fr)) minmax(260px, auto);
+  grid-template-columns: minmax(210px, 1.1fr) repeat(4, minmax(130px, 0.9fr)) minmax(260px, auto);
   gap: 10px;
   align-items: stretch;
   margin-bottom: 14px;
@@ -142,8 +142,7 @@ h2 {
 .filter-group select,
 .filter-group input,
 .filter-range select,
-.filter-range input,
-.token-form input {
+.filter-range input {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -430,57 +429,6 @@ td small {
   padding: 4px 9px;
   font-family: var(--font-mono);
   font-size: 0.78rem;
-}
-
-.gate-screen {
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 24px;
-  background: var(--bg);
-}
-
-.token-form {
-  width: min(420px, 100%);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  padding: 28px;
-  box-shadow: var(--shadow);
-}
-
-.gate-mark {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--surface-strong);
-  color: var(--accent);
-}
-
-.token-form h1 {
-  margin: 16px 0 22px;
-}
-
-.token-form label {
-  display: grid;
-  gap: 8px;
-  color: var(--muted);
-}
-
-.token-form button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  min-height: 42px;
-  margin-top: 16px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #fff;
 }
 
 @media (max-width: 1100px) {
