@@ -36,9 +36,8 @@ export function normalizeCliArguments(args: readonly string[]): readonly string[
 }
 
 export function assertSingleMachineSnapshotPublication(paths: readonly string[]): void {
-  const snapshotPaths = paths
-    .map((path) => path.replaceAll("\\", "/").replace(/^\.\//, ""))
-    .filter((path) => path.startsWith("snapshots/"));
+  const normalizedPaths = paths.map((path) => path.replaceAll("\\", "/").replace(/^\.\//, ""));
+  const snapshotPaths = normalizedPaths.filter((path) => path.startsWith("snapshots/"));
   const machines = new Set<string>();
 
   for (const path of snapshotPaths) {
@@ -49,6 +48,14 @@ export function assertSingleMachineSnapshotPublication(paths: readonly string[])
     machines.add(match[1]);
   }
 
+  const isDataOnlySnapshotPublication =
+    snapshotPaths.length > 0 && snapshotPaths.length === normalizedPaths.length;
+  if (!isDataOnlySnapshotPublication) return;
+
+  if (machines.has("aon-mac")) {
+    throw new SnapshotPolicyError("Data publication cannot publish from retired machine folder: aon-mac");
+  }
+
   if (machines.size > 1) {
     throw new SnapshotPolicyError(
       `Data publication mixes machine folders: ${[...machines].sort().join(", ")}`,
@@ -56,7 +63,7 @@ export function assertSingleMachineSnapshotPublication(paths: readonly string[])
   }
 }
 
-export async function changedSnapshotPaths(
+export async function changedPaths(
   repositoryRoot: string,
   baseRevision: string,
   headRevision: string,
@@ -65,13 +72,12 @@ export async function changedSnapshotPaths(
   const output = await git(repositoryRoot, [
     "diff",
     "--name-only",
+    "-z",
     "--diff-filter=ACDMRTUXB",
     base,
     headRevision,
-    "--",
-    "snapshots",
   ]);
-  return output.split("\n").map((line) => line.trim()).filter(Boolean);
+  return output.split("\0").filter(Boolean);
 }
 
 export async function inspectSnapshotDirectories(
@@ -171,7 +177,7 @@ async function main(args: readonly string[]): Promise<void> {
   const [command, ...commandArgs] = args;
   if (command === "publication") {
     const [baseRevision = "", headRevision = "HEAD"] = normalizeCliArguments(commandArgs);
-    const paths = await changedSnapshotPaths(process.cwd(), baseRevision, headRevision);
+    const paths = await changedPaths(process.cwd(), baseRevision, headRevision);
     assertSingleMachineSnapshotPublication(paths);
     console.log(`Snapshot publication policy passed for ${paths.length} changed file(s).`);
     return;

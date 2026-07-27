@@ -13,14 +13,43 @@ const execFile = promisify(execFileCallback);
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 
 describe("snapshot CI policy", () => {
-  it("rejects a data publication that mixes machine folders", () => {
+  it("permits a migration that changes application artifacts and snapshots from multiple machines", () => {
+    expect(() =>
+      assertSingleMachineSnapshotPublication([
+        "packages/core/src/snapshots.ts",
+        "openspec/changes/migrate-to-git-snapshots/design.md",
+        "snapshots/angel-mac/2026/07/2026-07-26.json",
+        "snapshots/aon-mac/2026/07/2026-07-26.json",
+        "snapshots/aon-mac-m5/2026/07/2026-07-26.json",
+      ]),
+    ).not.toThrow();
+  });
+
+  it("rejects a data-only publication that mixes active machine folders", () => {
     expect(() =>
       assertSingleMachineSnapshotPublication([
         "snapshots/angel-mac/2026/07/2026-07-26.json",
-        "snapshots/aon-mac/2026/07/2026-07-26.json",
+        "snapshots/aon-mac-m5/2026/07/2026-07-26.json",
       ]),
     ).toThrow(/mixes machine folders/);
+  });
 
+  it("rejects retired and non-canonical snapshot paths", () => {
+    expect(() =>
+      assertSingleMachineSnapshotPublication([
+        "snapshots/aon-mac/2026/07/2026-07-26.json",
+      ]),
+    ).toThrow(/retired machine folder/);
+
+    expect(() =>
+      assertSingleMachineSnapshotPublication([
+        "packages/core/src/snapshots.ts",
+        "snapshots/angel-mac/2026/07/../../package.json",
+      ]),
+    ).toThrow(/non-canonical snapshot path/);
+  });
+
+  it("accepts a data-only publication owned by one active machine", () => {
     expect(() =>
       assertSingleMachineSnapshotPublication([
         "snapshots/aon-mac-m5/2026/07/2026-07-25.json",
