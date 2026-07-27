@@ -1,5 +1,4 @@
 import type { Hono } from "hono";
-import { quotaSnapshotsResponseSchema } from "@tokenviewer/core";
 import { z } from "zod";
 import type { AppContext } from "../app.js";
 import { requireDashboard, resolveMachine } from "../auth.js";
@@ -17,6 +16,27 @@ const legacyQuotaIngestRequestSchema = z.object({ snapshot: legacyQuotaSnapshotS
 const legacyQuotaIngestResponseSchema = z.object({
   accepted: z.boolean(),
   reason: z.string().optional(),
+});
+const legacyQuotaSnapshotsResponseSchema = z.object({
+  provider: z.string().min(1),
+  accounts: z.array(
+    z.object({
+      account: z.string().min(1),
+      provider: z.string().min(1),
+      latest: z.object({
+        takenAt: z.string(),
+        percentUsed: z.number().finite().min(0).max(100).optional(),
+        plan: z.string().nullable(),
+        resetsAt: z.string().nullable(),
+      }),
+      series: z.array(
+        z.object({
+          takenAt: z.string(),
+          percentUsed: z.number().finite().min(0).max(100).optional(),
+        }),
+      ),
+    }),
+  ),
 });
 
 export function registerQuotaRoutes(app: Hono, context: AppContext): void {
@@ -145,7 +165,7 @@ export function registerQuotaRoutes(app: Hono, context: AppContext): void {
     }
 
     return c.json(
-      quotaSnapshotsResponseSchema.parse({
+      legacyQuotaSnapshotsResponseSchema.parse({
         provider,
         accounts: [...accounts.values()].map((account) => ({
           account: account.account,
