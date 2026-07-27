@@ -1,118 +1,83 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  collectAndSendCopilotQuota,
-  fetchCopilotQuotaSnapshot,
-  sendQuotaSnapshot,
-} from "../src/copilot-quota.js";
+import { collectCopilotQuota, fetchCopilotQuotaSample } from "../src/copilot-quota.js";
 
 describe("Copilot quota collection", () => {
-  it("maps a complete Copilot response to a quota snapshot", async () => {
-    const snapshot = await fetchCopilotQuotaSnapshot("gho_token", {
+  it("sanitizes a complete response", async () => {
+    const sample = await fetchCopilotQuotaSample("gho_token", {
       now: new Date("2026-07-05T10:00:00.000Z"),
       fetcher: async () =>
         Response.json({
           login: "octocat",
           plan: "Pro",
           resets_at: "2026-08-01T00:00:00Z",
-          quota_snapshots: {
-            premium_interactions: { percent_used: 67 },
-          },
-          unknown: { still: "kept" },
+          quota_snapshots: { premium_requests: { percent_used: 67 } },
+          payload: { private: true },
         }),
     });
 
-    expect(snapshot).toMatchObject({
+    expect(sample).toEqual({
       provider: "copilot",
       takenAt: "2026-07-05T10:00:00.000Z",
       percentUsed: 67,
       plan: "Pro",
       resetsAt: "2026-08-01T00:00:00.000Z",
-      raw: { login: "octocat", unknown: { still: "kept" } },
     });
   });
 
-  it("falls back to chat quota and accepts missing resets_at", async () => {
-    const snapshot = await fetchCopilotQuotaSnapshot("gho_token", {
-      fetcher: async () =>
-        Response.json({
-          user: { login: "octocat" },
-          quota_snapshots: {
-            chat: { percent_used: 12 },
-          },
-        }),
+  it("accepts a partial response and falls back to chat", async () => {
+    const sample = await fetchCopilotQuotaSample("gho_token", {
+      now: new Date("2026-07-05T10:00:00.000Z"),
+      fetcher: async () => Response.json({ quota_snapshots: { chat: { percent_used: 12 } } }),
     });
 
-    expect(snapshot.percentUsed).toBe(12);
-    expect(snapshot.resetsAt).toBeUndefined();
-    expect(snapshot.raw.login).toBe("octocat");
+    expect(sample).toEqual({
+      provider: "copilot",
+      takenAt: "2026-07-05T10:00:00.000Z",
+      percentUsed: 12,
+    });
   });
 
-  it("sends snapshots without leaking the GitHub token", async () => {
-    const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
-    await sendQuotaSnapshot({
-      serverUrl: "http://server.local/",
-      machineToken: "tv_machine",
-      snapshot: {
-        provider: "copilot",
-        takenAt: "2026-07-05T10:00:00.000Z",
-        raw: { login: "octocat" },
-      },
-      fetcher: async (url, init) => {
-        calls.push({ url: String(url), init });
-        return Response.json({ accepted: true });
-      },
+  it("discards unknown response fields", async () => {
+    const sample = await fetchCopilotQuotaSample("gho_token", {
+      now: new Date("2026-07-05T10:00:00.000Z"),
+      fetcher: async () => Response.json({ future_account_id: "private", future_payload: { raw: true } }),
     });
 
-    expect(calls[0]?.url).toBe("http://server.local/api/v1/ingest-quota");
-    expect(calls[0]?.init?.headers).toMatchObject({ authorization: "Bearer tv_machine" });
-    expect(calls[0]?.init?.body).not.toContain("gho_");
+    expect(sample).toEqual({ provider: "copilot", takenAt: "2026-07-05T10:00:00.000Z" });
+    expect(JSON.stringify(sample)).not.toMatch(/account|payload|private|raw/);
   });
 
-  it("warns on 401 and continues", async () => {
+  it("omits collection without a token", async () => {
     const warnings: string[] = [];
-    const result = await collectAndSendCopilotQuota({
-      token: "gho_token",
-      serverUrl: "http://server.local",
-      machineToken: "tv_machine",
-      warnings,
-      fetcher: async () => new Response("no", { status: 401 }),
-    });
+    const fetcher = vi.fn();
+    await expect(collectCopilotQuota({ warnings, fetcher })).resolves.toBeUndefined();
+    expect(warnings).toEqual([]);
+    expect(fetcher).not.toHaveBeenCalled();
+  });
 
-    expect(result).toBeUndefined();
+  it("warns on a revoked token and continues", async () => {
+    const warnings: string[] = [];
+    await expect(
+      collectCopilotQuota({
+        token: "gho_token",
+        warnings,
+        fetcher: async () => new Response("no", { status: 401 }),
+      }),
+    ).resolves.toBeUndefined();
     expect(warnings.join("\n")).toContain("copilot login");
   });
 
-  it("treats an old server 404 as best-effort", async () => {
+  it("warns on a network failure and continues", async () => {
     const warnings: string[] = [];
-    const result = await collectAndSendCopilotQuota({
-      token: "gho_token",
-      serverUrl: "http://server.local",
-      machineToken: "tv_machine",
-      warnings,
-      fetcher: async (url) => {
-        if (String(url) === "https://api.github.com/copilot_internal/user") {
-          return Response.json({ login: "octocat", quota_snapshots: { chat: { percent_used: 5 } } });
-        }
-        return new Response("not found", { status: 404 });
-      },
-    });
-
-    expect(result).toBeUndefined();
-    expect(warnings.join("\n")).toContain("HTTP 404");
-  });
-
-  it("omits collection silently without a token", async () => {
-    const warnings: string[] = [];
-    const fetcher = vi.fn();
     await expect(
-      collectAndSendCopilotQuota({
-        serverUrl: "http://server.local",
-        machineToken: "tv_machine",
+      collectCopilotQuota({
+        token: "gho_token",
         warnings,
-        fetcher,
+        fetcher: async () => {
+          throw new Error("network unavailable");
+        },
       }),
     ).resolves.toBeUndefined();
-    expect(warnings).toEqual([]);
-    expect(fetcher).not.toHaveBeenCalled();
+    expect(warnings).toEqual(["copilot: network unavailable"]);
   });
 });

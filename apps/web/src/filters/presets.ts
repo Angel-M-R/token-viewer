@@ -1,4 +1,4 @@
-import type { ApiFilters } from "../api/client";
+import type { LocalFilters } from "../data/repository";
 import type { DashboardFilters, RangePreset } from "./types";
 
 const DAY_MS = 86_400_000;
@@ -12,12 +12,13 @@ export const RANGE_LABELS: Record<RangePreset, string> = {
   custom: "Custom",
 };
 
-export function resolveApiFilters(filters: DashboardFilters, now = new Date()): ApiFilters {
+export function resolveApiFilters(filters: DashboardFilters, now = new Date()): LocalFilters {
   const range = resolveDateRange(filters, now);
   return {
     ...range,
     machine: filters.machines,
     agent: filters.agents,
+    provider: filters.providers,
     model: filters.models,
   };
 }
@@ -49,7 +50,7 @@ export function resolveDateRange(
   };
 }
 
-export function previousPeriod(filters: DashboardFilters, now = new Date()): ApiFilters | null {
+export function previousPeriod(filters: DashboardFilters, now = new Date()): LocalFilters | null {
   const current = resolveDateRange(filters, now);
   if (!current.from || !current.to) {
     return null;
@@ -69,6 +70,7 @@ export function previousPeriod(filters: DashboardFilters, now = new Date()): Api
     to: dateOnly(previousTo),
     machine: filters.machines,
     agent: filters.agents,
+    provider: filters.providers,
     model: filters.models,
   };
 }
@@ -90,4 +92,3 @@ function addDays(date: Date, days: number): Date {
   next.setDate(next.getDate() + days);
   return next;
 }
-

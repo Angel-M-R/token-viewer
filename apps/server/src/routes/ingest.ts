@@ -1,9 +1,14 @@
 import { gunzipSync } from "node:zlib";
 import type { Hono } from "hono";
-import { ingestRequestSchema, type UsageRecord } from "@tokenviewer/core";
+import { usageRecordSchema, type UsageRecord } from "@tokenviewer/core";
+import { z } from "zod";
 import type { AppContext } from "../app.js";
 import { resolveMachine } from "../auth.js";
 import { loadPricingCatalog, priceUsageRecord } from "../pricing/index.js";
+
+const legacyIngestRequestSchema = z.object({
+  records: z.array(usageRecordSchema).max(1000),
+});
 
 export function registerIngestRoutes(app: Hono, context: AppContext): void {
   app.post("/api/v1/ingest", async (c) => {
@@ -13,7 +18,7 @@ export function registerIngestRoutes(app: Hono, context: AppContext): void {
     }
 
     const body = await readJsonBody(c.req.raw);
-    const parsed = ingestRequestSchema.safeParse(body);
+    const parsed = legacyIngestRequestSchema.safeParse(body);
     if (!parsed.success) {
       return c.json({ error: "invalid request", issues: parsed.error.issues }, 400);
     }

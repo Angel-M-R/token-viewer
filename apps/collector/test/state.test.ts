@@ -55,13 +55,37 @@ describe.sequential("collector config", () => {
     process.env.XDG_CONFIG_HOME = dir;
 
     await saveCollectorConfig({
-      serverUrl: "http://server.local",
-      machineToken: "tv_token",
       copilotToken: "gho_secret",
-      machineName: "machine",
+      machineName: "angel-mac",
+      checkoutPath: dir,
+      agents: ["claude"],
     });
 
-    expect((await loadCollectorConfig()).copilotToken).toBe("gho_secret");
+    expect(await loadCollectorConfig()).toMatchObject({
+      copilotToken: "gho_secret",
+      machineName: "angel-mac",
+      checkoutPath: dir,
+      agents: ["claude"],
+    });
     expect((await stat(configFilePath())).mode & 0o777).toBe(0o600);
+  });
+
+  it.sequential("rejects legacy server credentials and unapproved identities", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "tv-config-"));
+    process.env.XDG_CONFIG_HOME = dir;
+    const path = configFilePath();
+    await import("node:fs/promises").then(({ mkdir }) => mkdir(path.slice(0, path.lastIndexOf("/")), { recursive: true }));
+    await writeFile(
+      path,
+      JSON.stringify({
+        machineName: "other-machine",
+        checkoutPath: dir,
+        serverUrl: "https://server.local",
+        machineToken: "secret",
+      }),
+      "utf8",
+    );
+
+    await expect(loadCollectorConfig()).rejects.toThrow(/machineName|Unrecognized key/);
   });
 });

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import { createInterface } from "node:readline/promises";
-import { hostname, platform } from "node:os";
 import { stdin as input, stdout as output } from "node:process";
+import { activePublisherMachineSchema } from "@tokenviewer/core";
 import { loadCollectorConfig, saveCollectorConfig } from "./config.js";
 import {
   fetchGitHubUserLogin,
@@ -29,36 +29,33 @@ async function main(argv: string[]): Promise<number> {
     const parsed = parseArgs({
       args: argv.slice(1),
       options: {
-        "server-url": { type: "string" },
-        "admin-token": { type: "string" },
         "machine-name": { type: "string" },
+        "checkout-path": { type: "string" },
+        "expected-remote-url": { type: "string" },
+        agents: { type: "string" },
       },
       allowPositionals: false,
     });
     const rl = createInterface({ input, output });
     try {
-      const serverUrl = (
-        parsed.values["server-url"] ?? (await rl.question("serverUrl: "))
-      ).trim().replace(/\/+$/, "");
-      const adminToken = (parsed.values["admin-token"] ?? (await rl.question("ADMIN_TOKEN: "))).trim();
-      const machineNameInput = (
-        parsed.values["machine-name"] ?? (await rl.question(`machineName (${hostname()}): `))
+      const machineName = activePublisherMachineSchema.parse(
+        (
+          parsed.values["machine-name"] ??
+          (await rl.question("machineName (angel-mac or mac-m5): "))
+        ).trim(),
+      );
+      const checkoutPath = (
+        parsed.values["checkout-path"] ?? (await rl.question("operational checkout path: "))
       ).trim();
-      const machineName = machineNameInput || hostname();
-      const response = await fetch(`${serverUrl}/api/v1/machines/register`, {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${adminToken}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ name: machineName, os: platform() }),
+      const agents = parsed.values.agents?.split(",").map((agent) => agent.trim()).filter(Boolean) as
+        | Parameters<typeof saveCollectorConfig>[0]["agents"]
+        | undefined;
+      await saveCollectorConfig({
+        machineName,
+        checkoutPath,
+        expectedRemoteUrl: parsed.values["expected-remote-url"]?.trim() || undefined,
+        agents,
       });
-      if (!response.ok) {
-        process.stderr.write(`registro fallido: HTTP ${response.status}\n`);
-        return 1;
-      }
-      const body = (await response.json()) as { machineToken: string };
-      await saveCollectorConfig({ serverUrl, machineName, machineToken: body.machineToken });
       process.stdout.write("collector configurado\n");
       return 0;
     } finally {
@@ -108,6 +105,7 @@ async function main(argv: string[]): Promise<number> {
       args: argv.slice(1),
       options: {
         "dry-run": { type: "boolean", default: false },
+        publish: { type: "boolean", default: false },
         full: { type: "boolean", default: false },
         out: { type: "string" },
         agents: { type: "string" },
@@ -123,6 +121,7 @@ async function main(argv: string[]): Promise<number> {
 
     const summary = await runCollector({
       dryRun: Boolean(parsed.values["dry-run"]),
+      publish: Boolean(parsed.values.publish),
       full: parsed.values.full,
       out: parsed.values.out,
       agents: parsed.values.agents?.split(",").map((agent) => agent.trim()).filter(Boolean),
@@ -140,9 +139,9 @@ function printHelp(): void {
   process.stdout.write(`tokenviewer-collector
 
 Usage:
-  tokenviewer-collector init [--server-url <url> --admin-token <token> --machine-name <name>]
+  tokenviewer-collector init --machine-name <angel-mac|mac-m5> --checkout-path <path> [--expected-remote-url <url>] [--agents claude,codex]
   tokenviewer-collector run --dry-run [--full] [--out <path>] [--agents claude,codex]
-  tokenviewer-collector run [--full] [--agents claude,codex]
+  tokenviewer-collector run [--publish] [--full] [--agents claude,codex]
   tokenviewer-collector status
   tokenviewer-collector copilot login
   tokenviewer-collector copilot status

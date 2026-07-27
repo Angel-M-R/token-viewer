@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2026-07-04",
+  "generatedAt": "2026-07-05T00:05:00.000Z",
+  "usage": [
+    {
+      "hour": "2026-07-04T23:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "unknown",
+      "requests": 1,
+      "inputTokens": 20,
+      "outputTokens": 10,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0.4,
+      "unpricedRequests": 1
+    },
+    {
+      "hour": "2026-07-04T23:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5",
+      "requests": 2,
+      "inputTokens": 100,
+      "outputTokens": 50,
+      "reasoningTokens": 10,
+      "cacheReadTokens": 20,
+      "cacheWriteTokens": 5,
+      "estimatedCost": 1.5,
+      "billedCost": 1.2,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [
+    {
+      "provider": "copilot",
+      "takenAt": "2026-07-04T12:00:00.000Z",
+      "percentUsed": 40,
+      "plan": "Pro",
+      "resetsAt": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "totals": {
+    "requests": 3,
+    "inputTokens": 120,
+    "outputTokens": 60,
+    "reasoningTokens": 10,
+    "cacheReadTokens": 20,
+    "cacheWriteTokens": 5,
+    "estimatedCost": 1.5,
+    "billedCost": 1.6,
+    "unpricedRequests": 1
+  }
+}

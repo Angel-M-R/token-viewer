@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "machine": "old-mac",
+  "date": "2026-07-04",
+  "generatedAt": "2026-07-05T00:10:00.000Z",
+  "usage": [
+    {
+      "hour": "2026-07-04T10:00:00.000Z",
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "unknown",
+      "requests": 1,
+      "inputTokens": 25,
+      "outputTokens": 5,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 1
+    }
+  ],
+  "quotaSamples": [
+    {
+      "provider": "copilot",
+      "takenAt": "2026-07-04T12:30:00.000Z",
+      "percentUsed": 18,
+      "plan": "Business",
+      "resetsAt": null
+    }
+  ],
+  "totals": {
+    "requests": 1,
+    "inputTokens": 25,
+    "outputTokens": 5,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 0,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0,
+    "billedCost": 0,
+    "unpricedRequests": 1
+  }
+}

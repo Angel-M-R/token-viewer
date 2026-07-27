@@ -1,5 +1,13 @@
 import { useMemo } from "react";
-import { useDaily, useHeatmap, useMachines, useModels, useQuotaSnapshots, useSummary } from "./api/hooks";
+import {
+  useAvailableFilters,
+  useDaily,
+  useHeatmap,
+  useMachines,
+  useModels,
+  useQuotaSnapshots,
+  useSummary,
+} from "./data/hooks";
 import { FilterBar } from "./filters/FilterBar";
 import { previousPeriod, resolveApiFilters, resolveDateRange } from "./filters/presets";
 import { useFilters } from "./filters/useFilters";
@@ -9,17 +17,11 @@ import { HourlyHeatmap } from "./features/heatmap/HourlyHeatmap";
 import { ModelsTable } from "./features/models/ModelsTable";
 import { CopilotQuotaCards } from "./features/quota/CopilotQuotaCards";
 import { SummaryCards } from "./features/summary/SummaryCards";
-import { TokenGate } from "./auth/TokenGate";
 import { useTheme, type ThemeName } from "./theme/useTheme";
 
 export function App() {
   const theme = useTheme();
-
-  return (
-    <TokenGate>
-      <Dashboard theme={theme} />
-    </TokenGate>
-  );
+  return <Dashboard theme={theme} />;
 }
 
 function Dashboard({ theme }: { theme: ThemeName }) {
@@ -30,6 +32,7 @@ function Dashboard({ theme }: { theme: ThemeName }) {
     () => ({
       ...apiFilters,
       agent: [],
+      provider: [],
       model: [],
     }),
     [apiFilters],
@@ -54,10 +57,12 @@ function Dashboard({ theme }: { theme: ThemeName }) {
   const quota = useQuotaSnapshots(apiFilters, "copilot");
   const modelOptions = useModels(modelOptionFilters);
   const machines = useMachines();
+  const availableFilters = useAvailableFilters(optionFilters);
 
-  const agents = unique(
+  const agents = availableFilters.data?.agents ?? unique(
     (dailyAgentOptions.data?.rows ?? []).map((row) => row.group).filter((value): value is string => Boolean(value)),
   );
+  const providers = availableFilters.data?.providers ?? [];
   const modelNames = unique(
     (modelOptions.data?.rows ?? []).map((row) => row.model).filter((value): value is string => Boolean(value)),
   );
@@ -74,13 +79,14 @@ function Dashboard({ theme }: { theme: ThemeName }) {
           <p className="eyebrow">TokenViewer</p>
           <h1>Usage desk</h1>
         </div>
-        <span className="status-pill">{summary.isFetching ? "Refreshing" : "Live"}</span>
+        <span className="status-pill">{summary.isFetching ? "Loading" : "Local"}</span>
       </header>
 
       <FilterBar
         filters={filters}
         machines={machines.data ?? []}
         agents={agents}
+        providers={providers}
         models={modelNames}
         onChange={(patch) => setFilters(patch)}
       />

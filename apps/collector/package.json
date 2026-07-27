@@ -17,7 +17,8 @@
     "postinstall": "node scripts/link-bin.mjs",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dev": "tsx src/cli.ts"
+    "dev": "tsx src/cli.ts",
+    "publish": "tsx src/cli.ts run --publish"
   },
   "dependencies": {
     "@tokenviewer/adapters": "workspace:*",

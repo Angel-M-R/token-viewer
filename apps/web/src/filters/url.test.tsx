@@ -19,6 +19,7 @@ describe("URL filters", () => {
       to: "2026-01-31",
       machines: ["desktop"],
       agents: ["codex"],
+      providers: ["openai"],
       models: ["gpt-5", "claude-opus"],
       heatmapMetric: "cost",
       dailyGroupBy: "model",

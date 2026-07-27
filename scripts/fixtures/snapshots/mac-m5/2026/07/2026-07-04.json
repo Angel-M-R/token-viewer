@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "machine": "mac-m5",
+  "date": "2026-07-04",
+  "generatedAt": "2026-07-05T00:15:00.000Z",
+  "usage": [
+    {
+      "hour": "2026-07-04T11:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5",
+      "requests": 2,
+      "inputTokens": 90,
+      "outputTokens": 30,
+      "reasoningTokens": 12,
+      "cacheReadTokens": 15,
+      "cacheWriteTokens": 5,
+      "estimatedCost": 0.005,
+      "billedCost": 0.004,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [
+    {
+      "provider": "copilot",
+      "takenAt": "2026-07-04T13:00:00.000Z",
+      "percentUsed": 42,
+      "plan": "Pro",
+      "resetsAt": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "totals": {
+    "requests": 2,
+    "inputTokens": 90,
+    "outputTokens": 30,
+    "reasoningTokens": 12,
+    "cacheReadTokens": 15,
+    "cacheWriteTokens": 5,
+    "estimatedCost": 0.005,
+    "billedCost": 0.004,
+    "unpricedRequests": 0
+  }
+}

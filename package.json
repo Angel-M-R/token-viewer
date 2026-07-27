@@ -11,7 +11,16 @@
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "validate:snapshots": "tsx packages/core/src/validate-snapshots-cli.ts snapshots",
+    "validate:snapshot-fixtures": "tsx packages/core/src/validate-snapshots-cli.ts scripts/fixtures/snapshots",
+    "migration:snapshots": "tsx scripts/migration/sqlite-snapshots.ts",
+    "test:migration": "vitest run scripts/migration/sqlite-snapshots.test.ts",
+    "typecheck:migration": "tsc -p scripts/migration/tsconfig.json",
+    "ci:check-snapshot-publication": "tsx scripts/ci/snapshot-policy.ts publication",
+    "ci:check-snapshot-budget": "tsx scripts/ci/snapshot-policy.ts budget snapshots scripts/fixtures/snapshots",
+    "test:ci-snapshots": "vitest run scripts/ci/snapshot-policy.test.ts",
+    "typecheck:ci-snapshots": "tsc -p scripts/ci/tsconfig.json"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
