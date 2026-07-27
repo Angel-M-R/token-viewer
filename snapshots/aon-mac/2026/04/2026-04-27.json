@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-04-27",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-04-27T12:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 4,
+      "inputTokens": 27684,
+      "outputTokens": 725,
+      "reasoningTokens": 39,
+      "cacheReadTokens": 67072,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.194876,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-04-27T12:00:00.000Z",
+      "agent": "t3code",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 5,
+      "inputTokens": 36136,
+      "outputTokens": 935,
+      "reasoningTokens": 60,
+      "cacheReadTokens": 81280,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.25117,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-04-27T15:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 101,
+      "inputTokens": 624362,
+      "outputTokens": 25940,
+      "reasoningTokens": 13090,
+      "cacheReadTokens": 10026368,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 11.705949,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-04-27T15:00:00.000Z",
+      "agent": "t3code",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 61,
+      "inputTokens": 453540,
+      "outputTokens": 20817,
+      "reasoningTokens": 9669,
+      "cacheReadTokens": 9374080,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 10.568999,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 171,
+    "inputTokens": 1141722,
+    "outputTokens": 48417,
+    "reasoningTokens": 22858,
+    "cacheReadTokens": 19548800,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 22.720994,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2025-12-09",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2025-12-09T11:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.1-codex-max",
+      "requests": 12,
+      "inputTokens": 10465,
+      "outputTokens": 729,
+      "reasoningTokens": 1728,
+      "cacheReadTokens": 121600,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.05285125,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-12-09T14:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.1-codex-max",
+      "requests": 11,
+      "inputTokens": 14870,
+      "outputTokens": 594,
+      "reasoningTokens": 1600,
+      "cacheReadTokens": 62464,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.048335499999999997,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 23,
+    "inputTokens": 25335,
+    "outputTokens": 1323,
+    "reasoningTokens": 3328,
+    "cacheReadTokens": 184064,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0.10118674999999999,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

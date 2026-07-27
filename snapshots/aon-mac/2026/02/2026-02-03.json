@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-02-03",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-02-03T00:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.2-codex",
+      "requests": 11,
+      "inputTokens": 38124,
+      "outputTokens": 2838,
+      "reasoningTokens": 5504,
+      "cacheReadTokens": 271104,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.2309482,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-02-03T14:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.2-codex",
+      "requests": 4,
+      "inputTokens": 11690,
+      "outputTokens": 236,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 42240,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.0311535,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-02-03T15:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.2-codex",
+      "requests": 14,
+      "inputTokens": 19816,
+      "outputTokens": 2001,
+      "reasoningTokens": 2944,
+      "cacheReadTokens": 198912,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.1387176,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-02-03T16:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.2-codex",
+      "requests": 17,
+      "inputTokens": 29821,
+      "outputTokens": 4916,
+      "reasoningTokens": 1984,
+      "cacheReadTokens": 397440,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.21833875,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 46,
+    "inputTokens": 99451,
+    "outputTokens": 9991,
+    "reasoningTokens": 10432,
+    "cacheReadTokens": 909696,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0.61915805,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

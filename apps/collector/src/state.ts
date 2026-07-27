@@ -7,6 +7,7 @@ export interface CollectorState {
   schemaVersion: 1;
   files: FileCursorMap;
   lastRunAt?: string;
+  pendingPublicationCommit?: string;
 }
 
 export interface LoadStateResult {
@@ -25,6 +26,7 @@ const collectorStateSchema = z.object({
   schemaVersion: z.literal(1),
   files: z.record(z.string(), fileCursorSchema),
   lastRunAt: z.string().datetime({ offset: true }).optional(),
+  pendingPublicationCommit: z.string().min(1).optional(),
 });
 
 export async function loadCollectorState(): Promise<LoadStateResult> {

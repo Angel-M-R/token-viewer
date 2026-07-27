@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-07-14",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-07-14T09:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5",
+      "requests": 30,
+      "inputTokens": 56,
+      "outputTokens": 29162,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 3112494,
+      "cacheWriteTokens": 126252,
+      "estimatedCost": 6.149304,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-07-14T09:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-4-8",
+      "requests": 5,
+      "inputTokens": 10,
+      "outputTokens": 2626,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 112309,
+      "cacheWriteTokens": 14972,
+      "estimatedCost": 0.2154295,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-07-14T13:00:00.000Z",
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "gpt-5.6-terra",
+      "requests": 12,
+      "inputTokens": 79355,
+      "outputTokens": 5155,
+      "reasoningTokens": 1489,
+      "cacheReadTokens": 693850,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.47151,
+      "billedCost": 0.521084375,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-07-14T14:00:00.000Z",
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "gpt-5.6-terra",
+      "requests": 21,
+      "inputTokens": 78746,
+      "outputTokens": 6738,
+      "reasoningTokens": 2568,
+      "cacheReadTokens": 1101398,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.6118045,
+      "billedCost": 0.660981375,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 68,
+    "inputTokens": 158167,
+    "outputTokens": 43681,
+    "reasoningTokens": 4057,
+    "cacheReadTokens": 5020051,
+    "cacheWriteTokens": 141224,
+    "estimatedCost": 7.448048,
+    "billedCost": 1.18206575,
+    "unpricedRequests": 0
+  }
+}

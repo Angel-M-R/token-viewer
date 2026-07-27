@@ -56,21 +56,3 @@ export interface Adapter {
   detect(): Promise<boolean>;
   usage(options?: UsageOptions): AsyncGenerator<UsageRecord>;
 }
-
-export interface MachineEnvelope {
-  machineName: string;
-  machineToken: string;
-}
-
-export interface IngestPayload extends MachineEnvelope {
-  records: UsageRecord[];
-}
-
-export interface IngestResult {
-  accepted: number;
-  duplicates: number;
-}
-
-export interface IngestClient {
-  ingest(payload: IngestPayload): Promise<IngestResult>;
-}

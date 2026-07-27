@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2025-10-11",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "hour": "2025-10-11T19:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 31,
+      "inputTokens": 70205,
+      "outputTokens": 5913,
+      "reasoningTokens": 27584,
+      "cacheReadTokens": 615936,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.49971825000000003,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-10-11T21:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 15,
+      "inputTokens": 16122,
+      "outputTokens": 1630,
+      "reasoningTokens": 3264,
+      "cacheReadTokens": 154624,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.0884205,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-10-11T22:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 68,
+      "inputTokens": 189231,
+      "outputTokens": 4714,
+      "reasoningTokens": 8832,
+      "cacheReadTokens": 1339392,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.53942275,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-10-11T23:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 123,
+      "inputTokens": 391745,
+      "outputTokens": 27364,
+      "reasoningTokens": 68352,
+      "cacheReadTokens": 10208768,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 2.72293725,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 237,
+    "inputTokens": 667303,
+    "outputTokens": 39621,
+    "reasoningTokens": 108032,
+    "cacheReadTokens": 12318720,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 3.8504987500000003,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

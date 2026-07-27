@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-04-22",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-04-22T06:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 15,
+      "inputTokens": 226538,
+      "outputTokens": 5261,
+      "reasoningTokens": 1781,
+      "cacheReadTokens": 1119360,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.951815,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-04-22T09:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 18,
+      "inputTokens": 140801,
+      "outputTokens": 6371,
+      "reasoningTokens": 3181,
+      "cacheReadTokens": 784640,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.6914425,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-04-22T10:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 12,
+      "inputTokens": 231353,
+      "outputTokens": 12054,
+      "reasoningTokens": 2754,
+      "cacheReadTokens": 997888,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.0499745,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-04-22T14:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 4,
+      "inputTokens": 29866,
+      "outputTokens": 1309,
+      "reasoningTokens": 1493,
+      "cacheReadTokens": 60416,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.131799,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 49,
+    "inputTokens": 628558,
+    "outputTokens": 24995,
+    "reasoningTokens": 9209,
+    "cacheReadTokens": 2962304,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 2.825031,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

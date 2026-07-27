@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2026-06-10",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "hour": "2026-06-10T18:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5",
+      "requests": 6,
+      "inputTokens": 5969,
+      "outputTokens": 1670,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 106939,
+      "cacheWriteTokens": 16147,
+      "estimatedCost": 0.4519665,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-06-10T18:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 33,
+      "inputTokens": 380251,
+      "outputTokens": 9380,
+      "reasoningTokens": 3315,
+      "cacheReadTokens": 3043328,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 5.70521,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-06-10T19:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5",
+      "requests": 12,
+      "inputTokens": 282,
+      "outputTokens": 7319,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 365717,
+      "cacheWriteTokens": 7091,
+      "estimatedCost": 0.8231245,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-06-10T19:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 20,
+      "inputTokens": 68447,
+      "outputTokens": 6070,
+      "reasoningTokens": 2306,
+      "cacheReadTokens": 998912,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.092971,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 71,
+    "inputTokens": 454949,
+    "outputTokens": 24439,
+    "reasoningTokens": 5621,
+    "cacheReadTokens": 4514896,
+    "cacheWriteTokens": 23238,
+    "estimatedCost": 8.073272000000001,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

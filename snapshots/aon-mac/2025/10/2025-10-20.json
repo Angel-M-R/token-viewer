@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2025-10-20",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2025-10-20T07:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 87,
+      "inputTokens": 154245,
+      "outputTokens": 8275,
+      "reasoningTokens": 34112,
+      "cacheReadTokens": 4757120,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.21131625,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-10-20T11:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 64,
+      "inputTokens": 74936,
+      "outputTokens": 9500,
+      "reasoningTokens": 20160,
+      "cacheReadTokens": 808576,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.491342,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-10-20T12:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5-codex",
+      "requests": 16,
+      "inputTokens": 26004,
+      "outputTokens": 1708,
+      "reasoningTokens": 4032,
+      "cacheReadTokens": 90624,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.101233,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 167,
+    "inputTokens": 255185,
+    "outputTokens": 19483,
+    "reasoningTokens": 58304,
+    "cacheReadTokens": 5656320,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 1.80389125,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

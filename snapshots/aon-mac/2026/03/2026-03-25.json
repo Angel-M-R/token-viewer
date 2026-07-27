@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-03-25",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-03-25T12:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 3,
+      "inputTokens": 18482,
+      "outputTokens": 530,
+      "reasoningTokens": 717,
+      "cacheReadTokens": 54144,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.078446,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-03-25T13:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 52,
+      "inputTokens": 344627,
+      "outputTokens": 10438,
+      "reasoningTokens": 8210,
+      "cacheReadTokens": 4384128,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 2.2373195,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-03-25T13:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
+      "requests": 16,
+      "inputTokens": 134500,
+      "outputTokens": 5665,
+      "reasoningTokens": 7673,
+      "cacheReadTokens": 1350144,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.26215679999999997,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-03-25T15:00:00.000Z",
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "gpt-5.4",
+      "requests": 20,
+      "inputTokens": 71149,
+      "outputTokens": 7204,
+      "reasoningTokens": 2949,
+      "cacheReadTokens": 376320,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.4242475,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 91,
+    "inputTokens": 568758,
+    "outputTokens": 23837,
+    "reasoningTokens": 19549,
+    "cacheReadTokens": 6164736,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 3.0021698,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

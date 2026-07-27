@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2025-12-04",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2025-12-04T09:00:00.000Z",
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4.5-opus-high-thinking",
+      "requests": 1,
+      "inputTokens": 29685,
+      "outputTokens": 3365,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 1
+    },
+    {
+      "hour": "2025-12-04T10:00:00.000Z",
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4.5-opus-high-thinking",
+      "requests": 2,
+      "inputTokens": 71905,
+      "outputTokens": 8393,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 2
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 3,
+    "inputTokens": 101590,
+    "outputTokens": 11758,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 0,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0,
+    "billedCost": 0,
+    "unpricedRequests": 3
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-07-04",
+  "generatedAt": "2026-07-05T00:10:00.000Z",
+  "usage": [
+    {
+      "hour": "2026-07-04T10:00:00.000Z",
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus",
+      "requests": 4,
+      "inputTokens": 400,
+      "outputTokens": 200,
+      "reasoningTokens": 40,
+      "cacheReadTokens": 80,
+      "cacheWriteTokens": 20,
+      "estimatedCost": 4,
+      "billedCost": 3.5,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [
+    {
+      "provider": "copilot",
+      "takenAt": "2026-07-04T12:30:00.000Z",
+      "percentUsed": 20,
+      "plan": "Business",
+      "resetsAt": null
+    }
+  ],
+  "totals": {
+    "requests": 4,
+    "inputTokens": 400,
+    "outputTokens": 200,
+    "reasoningTokens": 40,
+    "cacheReadTokens": 80,
+    "cacheWriteTokens": 20,
+    "estimatedCost": 4,
+    "billedCost": 3.5,
+    "unpricedRequests": 0
+  }
+}

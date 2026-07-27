@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2025-09-11",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "hour": "2025-09-11T21:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "unknown",
+      "requests": 34,
+      "inputTokens": 89486,
+      "outputTokens": 5085,
+      "reasoningTokens": 3968,
+      "cacheReadTokens": 919808,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 34
+    },
+    {
+      "hour": "2025-09-11T22:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "unknown",
+      "requests": 96,
+      "inputTokens": 348822,
+      "outputTokens": 32650,
+      "reasoningTokens": 26688,
+      "cacheReadTokens": 2587392,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 96
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 130,
+    "inputTokens": 438308,
+    "outputTokens": 37735,
+    "reasoningTokens": 30656,
+    "cacheReadTokens": 3507200,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0,
+    "billedCost": 0,
+    "unpricedRequests": 130
+  }
+}

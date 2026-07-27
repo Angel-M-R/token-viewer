@@ -9,6 +9,7 @@ export interface DashboardFilters {
   to?: string;
   machines: string[];
   agents: string[];
+  providers: string[];
   models: string[];
   heatmapMetric: HeatmapMetric;
   dailyGroupBy: DailyGroupBy;
@@ -19,9 +20,9 @@ export const DEFAULT_FILTERS: DashboardFilters = {
   range: "30d",
   machines: [],
   agents: [],
+  providers: [],
   models: [],
   heatmapMetric: "tokens",
   dailyGroupBy: "agent",
   dailyMetric: "tokens",
 };
-

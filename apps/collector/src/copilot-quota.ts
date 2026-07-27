@@ -1,4 +1,4 @@
-import type { QuotaIngestResponse, QuotaSnapshot } from "@tokenviewer/core";
+import { sanitizedQuotaSampleSchema, type SanitizedQuotaSample } from "@tokenviewer/core";
 
 export const COPILOT_INTERNAL_USER_URL = "https://api.github.com/copilot_internal/user";
 export const COPILOT_HEADERS = {
@@ -10,10 +10,10 @@ export const COPILOT_HEADERS = {
 
 export class CopilotAuthError extends Error {}
 
-export async function fetchCopilotQuotaSnapshot(
+export async function fetchCopilotQuotaSample(
   token: string,
   options: { fetcher?: typeof fetch; now?: Date } = {},
-): Promise<QuotaSnapshot> {
+): Promise<SanitizedQuotaSample> {
   const fetcher = options.fetcher ?? fetch;
   const response = await fetcher(COPILOT_INTERNAL_USER_URL, {
     headers: {
@@ -31,56 +31,29 @@ export async function fetchCopilotQuotaSnapshot(
   }
 
   const raw = (await response.json()) as Record<string, unknown>;
-  return {
+  return sanitizedQuotaSampleSchema.parse({
     provider: "copilot",
     takenAt: (options.now ?? new Date()).toISOString(),
     percentUsed: quotaPercent(raw),
     plan: stringValue(raw["plan"]) ?? stringValue(raw["sku"]) ?? stringValue(recordValue(raw["copilot_plan"])?.["name"]),
     resetsAt: resetValue(raw),
-    raw: ensureLogin(raw),
-  };
-}
-
-export async function sendQuotaSnapshot(options: {
-  serverUrl: string;
-  machineToken: string;
-  snapshot: QuotaSnapshot;
-  fetcher?: typeof fetch;
-}): Promise<QuotaIngestResponse> {
-  const fetcher = options.fetcher ?? fetch;
-  const response = await fetcher(`${options.serverUrl.replace(/\/+$/, "")}/api/v1/ingest-quota`, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${options.machineToken}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({ snapshot: options.snapshot }),
   });
-
-  if (!response.ok) {
-    throw new Error(`quota ingest failed with HTTP ${response.status}`);
-  }
-  return (await response.json()) as QuotaIngestResponse;
 }
 
-export async function collectAndSendCopilotQuota(options: {
+export async function collectCopilotQuota(options: {
   token?: string;
-  serverUrl?: string;
-  machineToken?: string;
   warnings: string[];
   fetcher?: typeof fetch;
-}): Promise<QuotaIngestResponse | undefined> {
-  if (!options.token || !options.serverUrl || !options.machineToken) {
+  now?: Date;
+}): Promise<SanitizedQuotaSample | undefined> {
+  if (!options.token) {
     return undefined;
   }
 
   try {
-    const snapshot = await fetchCopilotQuotaSnapshot(options.token, { fetcher: options.fetcher });
-    return await sendQuotaSnapshot({
-      serverUrl: options.serverUrl,
-      machineToken: options.machineToken,
-      snapshot,
+    return await fetchCopilotQuotaSample(options.token, {
       fetcher: options.fetcher,
+      now: options.now,
     });
   } catch (error) {
     if (error instanceof CopilotAuthError) {
@@ -116,17 +89,6 @@ function resetValue(raw: Record<string, unknown>): string | undefined {
     dateString(recordValue(raw["quota_snapshots"])?.["resets_at"]) ??
     dateString(recordValue(raw["premium_interactions"])?.["resets_at"])
   );
-}
-
-function ensureLogin(raw: Record<string, unknown>): Record<string, unknown> {
-  if (stringValue(raw["login"])) {
-    return raw;
-  }
-  const nestedLogin =
-    stringValue(recordValue(raw["user"])?.["login"]) ??
-    stringValue(recordValue(raw["github"])?.["login"]) ??
-    stringValue(recordValue(raw["viewer"])?.["login"]);
-  return nestedLogin ? { ...raw, login: nestedLogin } : raw;
 }
 
 function recordValue(value: unknown): Record<string, unknown> | null {

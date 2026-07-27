@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-02-10",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-02-10T09:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 187,
+      "inputTokens": 429626,
+      "outputTokens": 35056,
+      "reasoningTokens": 41162,
+      "cacheReadTokens": 19612544,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 5.2510927,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-02-10T10:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 20,
+      "inputTokens": 73118,
+      "outputTokens": 6207,
+      "reasoningTokens": 5729,
+      "cacheReadTokens": 2012544,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.6472557,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-02-10T13:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 23,
+      "inputTokens": 79700,
+      "outputTokens": 4256,
+      "reasoningTokens": 5381,
+      "cacheReadTokens": 1153152,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.47619459999999997,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-02-10T14:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 93,
+      "inputTokens": 238429,
+      "outputTokens": 18904,
+      "reasoningTokens": 19473,
+      "cacheReadTokens": 9299840,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 2.5820007499999997,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 323,
+    "inputTokens": 820873,
+    "outputTokens": 64423,
+    "reasoningTokens": 71745,
+    "cacheReadTokens": 32078080,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 8.95654375,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

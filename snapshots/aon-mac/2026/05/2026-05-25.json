@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "aon-mac",
+  "date": "2026-05-25",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "hour": "2026-05-25T10:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 17,
+      "inputTokens": 149143,
+      "outputTokens": 2517,
+      "reasoningTokens": 1087,
+      "cacheReadTokens": 493568,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.100619,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-05-25T11:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 48,
+      "inputTokens": 164261,
+      "outputTokens": 7686,
+      "reasoningTokens": 3732,
+      "cacheReadTokens": 1610752,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.969221,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-05-25T16:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 12,
+      "inputTokens": 79670,
+      "outputTokens": 1672,
+      "reasoningTokens": 669,
+      "cacheReadTokens": 323584,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.630372,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-05-25T17:00:00.000Z",
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 5,
+      "inputTokens": 3486,
+      "outputTokens": 1152,
+      "reasoningTokens": 209,
+      "cacheReadTokens": 193024,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.154772,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 82,
+    "inputTokens": 396560,
+    "outputTokens": 13027,
+    "reasoningTokens": 5697,
+    "cacheReadTokens": 2620928,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 3.854984,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

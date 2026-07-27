@@ -1,52 +1,52 @@
-import type { QuotaSnapshotsResponse } from "@tokenviewer/core/schemas";
-import { CircleUserRound, RotateCcw } from "lucide-react";
+import { Monitor, RotateCcw } from "lucide-react";
 import { EChart } from "../../charts/EChart";
 import type { EChartsCoreOption } from "../../charts/registry";
+import type { LocalQuotaSnapshotsResponse } from "../../data/contracts";
 import type { ThemeName } from "../../theme/useTheme";
 
 interface CopilotQuotaCardsProps {
-  data?: QuotaSnapshotsResponse;
+  data?: LocalQuotaSnapshotsResponse;
   theme: ThemeName;
   isLoading: boolean;
   error?: unknown;
 }
 
 export function CopilotQuotaCards({ data, theme, isLoading, error }: CopilotQuotaCardsProps) {
-  if (isLoading || error || !data || data.accounts.length === 0) {
+  if (isLoading || error || !data || data.groups.length === 0) {
     return null;
   }
 
   return (
     <section className="quota-grid" aria-label="Copilot quota">
-      {data.accounts.map((account) => (
-        <article key={`${account.provider}:${account.account}`} className="summary-card quota-card">
+      {data.groups.map((group) => (
+        <article key={`${group.provider}:${group.machine}`} className="summary-card quota-card">
           <div className="summary-topline">
             <span>
-              <CircleUserRound size={16} aria-hidden="true" /> Copilot
+              <Monitor size={16} aria-hidden="true" /> Copilot
             </span>
-            <span>{account.account}</span>
+            <span>{group.machine}</span>
           </div>
           <div className="quota-card-body">
             <EChart
-              option={gaugeOption(account.latest.percentUsed)}
+              option={gaugeOption(group.latest.percentUsed)}
               theme={theme}
               className="quota-gauge"
-              ariaLabel={`${account.account} Copilot quota gauge`}
+              ariaLabel={`${group.machine} Copilot quota gauge`}
             />
             <div className="quota-meta">
-              <strong>{percentLabel(account.latest.percentUsed)}</strong>
-              <span>{account.latest.plan ?? "Plan n/a"}</span>
+              <strong>{percentLabel(group.latest.percentUsed)}</strong>
+              <span>{group.latest.plan ?? "Plan n/a"}</span>
               <span>
-                <RotateCcw size={14} aria-hidden="true" /> {daysUntilReset(account.latest.resetsAt)}
+                <RotateCcw size={14} aria-hidden="true" /> {daysUntilReset(group.latest.resetsAt)}
               </span>
             </div>
           </div>
-          {account.series.length > 1 ? (
+          {group.series.length > 1 ? (
             <EChart
-              option={sparklineOption(account.series)}
+              option={sparklineOption(group.series)}
               theme={theme}
               className="quota-sparkline"
-              ariaLabel={`${account.account} Copilot quota trend`}
+              ariaLabel={`${group.machine} Copilot quota trend`}
             />
           ) : (
             <div className="quota-single-point">Single snapshot</div>
@@ -90,7 +90,7 @@ function gaugeOption(percent: number | undefined): EChartsCoreOption {
   };
 }
 
-function sparklineOption(series: QuotaSnapshotsResponse["accounts"][number]["series"]): EChartsCoreOption {
+function sparklineOption(series: LocalQuotaSnapshotsResponse["groups"][number]["series"]): EChartsCoreOption {
   return {
     grid: { left: 6, right: 6, top: 8, bottom: 8 },
     xAxis: { type: "category", show: false, data: series.map((point) => point.takenAt) },

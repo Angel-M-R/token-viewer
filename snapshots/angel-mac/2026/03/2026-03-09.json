@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2026-03-09",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "hour": "2026-03-09T18:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 18,
+      "inputTokens": 46015,
+      "outputTokens": 3146,
+      "reasoningTokens": 2284,
+      "cacheReadTokens": 468480,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.23853025,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-03-09T19:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 19,
+      "inputTokens": 59198,
+      "outputTokens": 2460,
+      "reasoningTokens": 3198,
+      "cacheReadTokens": 582144,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.2846837,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-03-09T20:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 17,
+      "inputTokens": 122826,
+      "outputTokens": 2944,
+      "reasoningTokens": 991,
+      "cacheReadTokens": 693120,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.3913315,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2026-03-09T21:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.3-codex",
+      "requests": 8,
+      "inputTokens": 79370,
+      "outputTokens": 1183,
+      "reasoningTokens": 360,
+      "cacheReadTokens": 314880,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.2156035,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 62,
+    "inputTokens": 307409,
+    "outputTokens": 9733,
+    "reasoningTokens": 6833,
+    "cacheReadTokens": 2058624,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 1.13014895,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

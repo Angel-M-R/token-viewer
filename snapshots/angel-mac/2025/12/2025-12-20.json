@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "machine": "angel-mac",
+  "date": "2025-12-20",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "hour": "2025-12-20T10:00:00.000Z",
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "gemini-3-flash",
+      "requests": 1,
+      "inputTokens": 71422,
+      "outputTokens": 1048,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 1
+    },
+    {
+      "hour": "2025-12-20T16:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.2-codex",
+      "requests": 1,
+      "inputTokens": 4639,
+      "outputTokens": 146,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 2688,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.01063265,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "hour": "2025-12-20T17:00:00.000Z",
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.2-codex",
+      "requests": 25,
+      "inputTokens": 58598,
+      "outputTokens": 4812,
+      "reasoningTokens": 5504,
+      "cacheReadTokens": 280448,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.2960489,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 27,
+    "inputTokens": 134659,
+    "outputTokens": 6006,
+    "reasoningTokens": 5504,
+    "cacheReadTokens": 283136,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0.30668155,
+    "billedCost": 0,
+    "unpricedRequests": 1
+  }
+}
