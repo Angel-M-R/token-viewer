@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-05-20",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 108,
+      "inputTokens": 443839,
+      "outputTokens": 17302,
+      "reasoningTokens": 7342,
+      "cacheReadTokens": 5673984,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 5.795507,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 108,
+    "inputTokens": 443839,
+    "outputTokens": 17302,
+    "reasoningTokens": 7342,
+    "cacheReadTokens": 5673984,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 5.795507,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

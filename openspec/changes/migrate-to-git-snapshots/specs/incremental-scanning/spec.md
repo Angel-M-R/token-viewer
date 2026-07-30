@@ -18,7 +18,7 @@ El collector SHALL comparar, únicamente para una identidad activa configurada, 
 ## MODIFIED Requirements
 
 ### Requirement: Re-escaneo completo con --full
-El flag `--full` SHALL ignorar los cursores guardados, re-escanear todo el histórico disponible de todas las fuentes seleccionadas y reconstruir en memoria los agregados por fecha. Por defecto MUST escribir días ausentes y el día UTC abierto sin modificar días cerrados existentes; una opción explícita de reparación SHALL ser necesaria para reemplazar días cerrados y MUST pasar validación completa.
+El flag `--full` SHALL ignorar los cursores guardados, re-escanear todo el histórico disponible de todas las fuentes seleccionadas y reconstruir en memoria los agregados por fecha. Por defecto MUST escribir días ausentes y el día local `Europe/Madrid` abierto sin modificar días cerrados existentes; una opción explícita de reparación SHALL ser necesaria para reemplazar días cerrados y MUST pasar validación completa.
 
 #### Scenario: Backfill forzado inicial
 - **WHEN** se ejecuta `tokenviewer-collector run --full` sin snapshots existentes

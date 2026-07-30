@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2026-04-07",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "claude-opus-4.6",
+      "requests": 200,
+      "inputTokens": 3658728,
+      "outputTokens": 151125,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 11962523,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 28.0530265,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "gpt-5.4",
+      "requests": 227,
+      "inputTokens": 1101526,
+      "outputTokens": 105040,
+      "reasoningTokens": 46043,
+      "cacheReadTokens": 11000064,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 8.175509,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 427,
+    "inputTokens": 4760254,
+    "outputTokens": 256165,
+    "reasoningTokens": 46043,
+    "cacheReadTokens": 22962587,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 36.2285355,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

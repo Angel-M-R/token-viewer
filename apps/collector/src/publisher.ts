@@ -176,7 +176,7 @@ export async function assertOperationalCheckout(
 
   const remote = (await git(checkoutPath, ["remote", "get-url", "origin"])).trim();
   if (remote !== expectedRemoteUrl) {
-    throw new GitPublicationError("preflight", "origin does not match the expected private remote");
+    throw new GitPublicationError("preflight", "origin does not match the expected remote");
   }
 
   await git(checkoutPath, ["rev-parse", "--verify", "origin/master"]);

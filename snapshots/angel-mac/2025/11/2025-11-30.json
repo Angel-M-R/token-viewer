@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2025-11-30",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.1-codex-max",
+      "requests": 123,
+      "inputTokens": 563952,
+      "outputTokens": 17657,
+      "reasoningTokens": 11264,
+      "cacheReadTokens": 4093824,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.505878,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4.5-opus-high-thinking",
+      "requests": 8,
+      "inputTokens": 765136,
+      "outputTokens": 110485,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 8
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4.5-sonnet-thinking",
+      "requests": 4,
+      "inputTokens": 111103,
+      "outputTokens": 7498,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 4
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "composer-1",
+      "requests": 16,
+      "inputTokens": 595819,
+      "outputTokens": 34902,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 16
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 151,
+    "inputTokens": 2036010,
+    "outputTokens": 170542,
+    "reasoningTokens": 11264,
+    "cacheReadTokens": 4093824,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 1.505878,
+    "billedCost": 0,
+    "unpricedRequests": 28
+  }
+}

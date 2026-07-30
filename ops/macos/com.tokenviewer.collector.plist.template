@@ -7,12 +7,10 @@
   <key>ProgramArguments</key>
   <array>
     <string>/usr/bin/env</string>
-    <string>pnpm</string>
-    <string>--dir</string>
+    <string>node</string>
+    <string>__CHECKOUT_PATH__/ops/macos/run-daily-publisher.mjs</string>
+    <string>--checkout</string>
     <string>__CHECKOUT_PATH__</string>
-    <string>--filter</string>
-    <string>collector</string>
-    <string>publish</string>
   </array>
   <key>WorkingDirectory</key>
   <string>__CHECKOUT_PATH__</string>

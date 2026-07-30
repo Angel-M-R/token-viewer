@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Procesamiento local efímero
-El collector SHALL procesar cada `UsageRecord` únicamente en memoria para deduplicarlo, calcular su coste y agregarlo por fecha y hora antes de escribir el contrato de snapshot. TokenViewer MUST NOT persistir el registro individual en SQLite, ficheros versionados ni payloads de red.
+El collector SHALL procesar cada `UsageRecord` únicamente en memoria para deduplicarlo, calcular su coste y agregarlo por día local `Europe/Madrid` antes de escribir el contrato de snapshot. TokenViewer MUST NOT persistir el registro individual en SQLite, ficheros versionados ni payloads de red.
 
 #### Scenario: Registro normalizado
 - **WHEN** un adaptador emite un registro con tokens, dimensiones y campos privados
@@ -23,11 +23,11 @@ El collector SHALL procesar cada `UsageRecord` únicamente en memoria para dedup
 
 ### Requirement: Almacenamiento normalizado en UTC
 **Reason**: TokenViewer deja de almacenar registros individuales normalizados.
-**Migration**: Conservar UTC y los cinco contadores solo en las filas horarias agregadas del snapshot.
+**Migration**: Conservar los cinco contadores solo en las filas diarias agregadas del snapshot, asignadas al día local `Europe/Madrid`.
 
 #### Scenario: Persistencia agregada
 - **WHEN** se procesa un registro después de la migración
-- **THEN** solo su contribución agregada UTC puede persistirse
+- **THEN** solo su contribución agregada al día local puede persistirse
 
 ### Requirement: Envío por lotes desde el colector
 **Reason**: No existe servidor de ingesta ni transporte de registros.

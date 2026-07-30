@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2025-12-03",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.1-codex-max",
+      "requests": 71,
+      "inputTokens": 107350,
+      "outputTokens": 10240,
+      "reasoningTokens": 19456,
+      "cacheReadTokens": 1210752,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.5824914999999999,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4-sonnet",
+      "requests": 1,
+      "inputTokens": 18360,
+      "outputTokens": 843,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 1
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4-sonnet-thinking",
+      "requests": 1,
+      "inputTokens": 30738,
+      "outputTokens": 2850,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 1
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4.5-opus-high-thinking",
+      "requests": 40,
+      "inputTokens": 2853727,
+      "outputTokens": 141747,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 40
+    },
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "composer-1",
+      "requests": 4,
+      "inputTokens": 179483,
+      "outputTokens": 15999,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 4
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 117,
+    "inputTokens": 3189658,
+    "outputTokens": 171679,
+    "reasoningTokens": 19456,
+    "cacheReadTokens": 1210752,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0.5824914999999999,
+    "billedCost": 0,
+    "unpricedRequests": 46
+  }
+}

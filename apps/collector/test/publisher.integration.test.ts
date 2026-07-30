@@ -23,7 +23,7 @@ describe.sequential("Git snapshot publisher", () => {
 
     await expect(
       assertOperationalCheckout(setup.angel, "angel-mac", `${setup.remote}-other`),
-    ).rejects.toThrow(/expected private remote/);
+    ).rejects.toThrow(/expected remote/);
 
     await git(setup.angel, ["switch", "-c", "feature"]);
     await expect(assertOperationalCheckout(setup.angel, "angel-mac", setup.remote)).rejects.toThrow(/master/);
@@ -101,7 +101,7 @@ describe.sequential("Git snapshot publisher", () => {
 
   it("rebases and publishes concurrent commits from disjoint machine folders", async () => {
     const setup = await repositories("tv-publisher-concurrent-");
-    let publishedAonM5 = false;
+    let publishedMacM5 = false;
 
     const angelResult = await publishSnapshots(
       {
@@ -112,13 +112,13 @@ describe.sequential("Git snapshot publisher", () => {
       },
       {
         beforePushAttempt: async () => {
-          if (publishedAonM5) return;
-          publishedAonM5 = true;
+          if (publishedMacM5) return;
+          publishedMacM5 = true;
           await publishSnapshots({
-            checkoutPath: setup.aonM5,
+            checkoutPath: setup.macM5,
             machine: "mac-m5",
             expectedRemoteUrl: setup.remote,
-            generate: () => writeSnapshot(setup.aonM5, "mac-m5", "2026-07-26", "03:00:00"),
+            generate: () => writeSnapshot(setup.macM5, "mac-m5", "2026-07-26", "03:00:00"),
           });
         },
       },
@@ -150,7 +150,7 @@ describe.sequential("Git snapshot publisher", () => {
         beforePushAttempt: async () => {
           if (raced) return;
           raced = true;
-           await commitAndPush(setup.aonM5, "race.txt", "race\n", "test: race");
+           await commitAndPush(setup.macM5, "race.txt", "race\n", "test: race");
         },
       },
     );
@@ -172,8 +172,8 @@ describe.sequential("Git snapshot publisher", () => {
       },
       {
         beforePushAttempt: async (attempt) => {
-          await git(setup.aonM5, ["pull", "--rebase", "origin", "master"]);
-          await commitAndPush(setup.aonM5, `race-${attempt}.txt`, `${attempt}\n`, `test: race ${attempt}`);
+          await git(setup.macM5, ["pull", "--rebase", "origin", "master"]);
+          await commitAndPush(setup.macM5, `race-${attempt}.txt`, `${attempt}\n`, `test: race ${attempt}`);
         },
       },
     ).catch((caught: unknown) => caught);
@@ -219,10 +219,10 @@ describe.sequential("Git snapshot publisher", () => {
         beforePushAttempt: async () => {
           if (raced) return;
           raced = true;
-          await writeSnapshot(setup.aonM5, "angel-mac", "2026-07-26", "08:00:00");
-          await git(setup.aonM5, ["add", "--", "snapshots/angel-mac"]);
-          await git(setup.aonM5, ["commit", "-m", "data(snapshots): conflicting angel update"]);
-          await git(setup.aonM5, ["push", "origin", "master"]);
+          await writeSnapshot(setup.macM5, "angel-mac", "2026-07-26", "08:00:00");
+          await git(setup.macM5, ["add", "--", "snapshots/angel-mac"]);
+          await git(setup.macM5, ["commit", "-m", "data(snapshots): conflicting angel update"]);
+          await git(setup.macM5, ["push", "origin", "master"]);
         },
       },
     ).catch((caught: unknown) => caught);
@@ -284,7 +284,7 @@ interface RepositorySetup {
   root: string;
   remote: string;
   angel: string;
-  aonM5: string;
+  macM5: string;
 }
 
 async function repositories(prefix: string, withBaseSnapshot = false): Promise<RepositorySetup> {
@@ -299,8 +299,8 @@ async function repositories(prefix: string, withBaseSnapshot = false): Promise<R
   await git(seed, ["commit", "-m", "test: initialize remote"]);
   await git(seed, ["push", "origin", "master"]);
   const angel = await clone(remote, root, "angel");
-  const aonM5 = await clone(remote, root, "former-employer-m5");
-  return { root, remote, angel, aonM5 };
+  const macM5 = await clone(remote, root, "mac-m5");
+  return { root, remote, angel, macM5 };
 }
 
 async function clone(remote: string, root: string, name: string): Promise<string> {
@@ -323,7 +323,7 @@ async function writeSnapshot(
     path,
     `${JSON.stringify(
       {
-        schemaVersion: 1,
+        schemaVersion: 2,
         machine,
         date,
         generatedAt: `${date}T${generatedTime}.000Z`,

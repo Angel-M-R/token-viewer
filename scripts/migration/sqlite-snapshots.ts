@@ -9,7 +9,7 @@ import {
   allowedMachineSchema,
   type AllowedMachine,
   type DailySnapshot,
-  type HourlyUsageRow,
+  type DailyUsageRow,
   type SanitizedQuotaSample,
   type SnapshotTotals,
 } from "../../packages/core/src/snapshots.js";
@@ -36,7 +36,7 @@ type Metric = (typeof METRICS)[number];
 const LEGACY_MACHINES = ["angel-mac", "old-mac"] as const;
 type LegacyMachine = (typeof LEGACY_MACHINES)[number];
 
-interface LegacyUsageAggregate extends HourlyUsageRow {
+interface LegacyUsageAggregate extends DailyUsageRow {
   date: string;
 }
 
@@ -159,7 +159,6 @@ export function readLegacyAggregates(databasePath: string, machineInput: Allowed
     const usage = queryRows(database, `${DEDUPED_USAGE_CTE}
       SELECT
         strftime('%Y-%m-%d', ts) AS date,
-        strftime('%Y-%m-%dT%H:00:00.000Z', ts) AS hour,
         trim(agent) AS agent,
         COALESCE(NULLIF(trim(provider), ''), '${UNKNOWN_DIMENSION}') AS provider,
         COALESCE(NULLIF(trim(model), ''), '${UNKNOWN_DIMENSION}') AS model,
@@ -173,20 +172,20 @@ export function readLegacyAggregates(databasePath: string, machineInput: Allowed
         SUM(COALESCE(billed_cost_usd, 0)) AS billedCost,
         SUM(CASE WHEN cost_usd IS NULL THEN 1 ELSE 0 END) AS unpricedRequests
       FROM deduped_usage
-      GROUP BY date, hour, agent, provider, model
-      ORDER BY date, hour, agent, provider, model
+      GROUP BY date, agent, provider, model
+      ORDER BY date, agent, provider, model
     `, machine).map(parseUsageAggregate);
 
     const quotas = queryRows(database, `${DEDUPED_QUOTA_CTE}
       SELECT
         strftime('%Y-%m-%d', taken_at) AS date,
         trim(provider) AS provider,
-        strftime('%Y-%m-%dT%H:%M:%fZ', taken_at) AS takenAt,
+        strftime('%Y-%m-%d', taken_at) AS takenAt,
         percent_used AS percentUsed,
         plan,
         CASE WHEN resets_at IS NULL THEN NULL ELSE strftime('%Y-%m-%dT%H:%M:%fZ', resets_at) END AS resetsAt
       FROM deduped_quota
-      ORDER BY date, takenAt, provider
+      ORDER BY date, taken_at, provider
     `, machine).map(parseQuotaAggregate);
 
     const usageCounts = queryOne(database, `
@@ -246,7 +245,13 @@ export async function importLegacySnapshots(
       continue;
     }
     const usage = [...(usageByDate.get(date) ?? [])].map(({ date: _date, ...row }) => row);
-    const quotas = [...(quotaByDate.get(date) ?? [])].map(({ date: _date, ...sample }) => sample);
+    // Schema v2 carries a date-only `takenAt`, so a day keeps one sanitized sample per
+    // provider: the latest one, since the source rows are ordered by capture time.
+    const quotas = [
+      ...new Map(
+        (quotaByDate.get(date) ?? []).map(({ date: _date, ...sample }) => [sample.provider, sample]),
+      ).values(),
+    ];
     const snapshot: DailySnapshot = {
       schemaVersion: SNAPSHOT_SCHEMA_VERSION,
       machine,
@@ -450,7 +455,6 @@ async function assertNotSymlinkIfPresent(path: string, label: string): Promise<v
 function parseUsageAggregate(row: Record<string, unknown>): LegacyUsageAggregate {
   return {
     date: string(row, "date"),
-    hour: string(row, "hour"),
     agent: string(row, "agent"),
     provider: string(row, "provider"),
     model: string(row, "model"),
@@ -688,7 +692,7 @@ function groupByDate<T extends { date: string }>(rows: readonly T[]): Map<string
   return result;
 }
 
-function sumMetrics(rows: readonly HourlyUsageRow[]): SnapshotTotals {
+function sumMetrics(rows: readonly DailyUsageRow[]): SnapshotTotals {
   const totals = emptyMetrics();
   for (const row of rows) addMetrics(totals, row);
   return totals;

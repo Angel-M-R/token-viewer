@@ -5,7 +5,7 @@ El collector SHALL incorporar la muestra sanitizada de Copilot al snapshot diari
 
 #### Scenario: Muestra válida
 - **WHEN** la consulta de Copilot devuelve datos reconocibles
-- **THEN** el snapshot del día incluye únicamente proveedor, instante, porcentaje, plan y renovación
+- **THEN** el snapshot del día incluye únicamente proveedor, fecha local sin hora, porcentaje, plan y renovación
 
 #### Scenario: Token revocado
 - **WHEN** la API de Copilot responde 401
@@ -14,11 +14,11 @@ El collector SHALL incorporar la muestra sanitizada de Copilot al snapshot diari
 ## MODIFIED Requirements
 
 ### Requirement: Snapshot de cuota en cada run
-Cuando exista un token local de Copilot, cada ejecución diaria del collector SHALL hacer como máximo una llamada a `GET https://api.github.com/copilot_internal/user`, con las cabeceras requeridas, y SHALL construir una muestra de cuota para el día UTC. Si no existe token, MUST omitir el paso sin afectar al resto del snapshot.
+Cuando exista un token local de Copilot, cada ejecución diaria del collector SHALL hacer como máximo una llamada a `GET https://api.github.com/copilot_internal/user`, con las cabeceras requeridas, y SHALL construir una muestra de cuota para el día local `Europe/Madrid`. Si no existe token, MUST omitir el paso sin afectar al resto del snapshot.
 
 #### Scenario: Run con token configurado
 - **WHEN** se ejecuta el collector y hay token de Copilot guardado localmente
-- **THEN** realiza una llamada y prepara una muestra con `provider = "copilot"` y `takenAt` UTC
+- **THEN** realiza una llamada y prepara una muestra con `provider = "copilot"` y `takenAt` como fecha local sin hora
 
 #### Scenario: Run sin token configurado
 - **WHEN** no hay token de Copilot

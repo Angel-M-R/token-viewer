@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-04-09",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 2,
+      "inputTokens": 38982,
+      "outputTokens": 117,
+      "reasoningTokens": 31,
+      "cacheReadTokens": 49408,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.11202699999999999,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "google",
+      "model": "gemini-3.1-pro-preview",
+      "requests": 79,
+      "inputTokens": 424806,
+      "outputTokens": 15874,
+      "reasoningTokens": 7464,
+      "cacheReadTokens": 5523585,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 2.234385,
+      "billedCost": 2.234385,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "google",
+      "model": "gemini-3.1-pro-preview-customtools",
+      "requests": 1,
+      "inputTokens": 24314,
+      "outputTokens": 198,
+      "reasoningTokens": 141,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.052696,
+      "billedCost": 0.052696,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 133,
+      "inputTokens": 724955,
+      "outputTokens": 52336,
+      "reasoningTokens": 32724,
+      "cacheReadTokens": 11923456,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 6.0691515,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 215,
+    "inputTokens": 1213057,
+    "outputTokens": 68525,
+    "reasoningTokens": 40360,
+    "cacheReadTokens": 17496449,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 8.4682595,
+    "billedCost": 2.287081,
+    "unpricedRequests": 0
+  }
+}

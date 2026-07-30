@@ -1,11 +1,11 @@
 ## ADDED Requirements
 
 ### Requirement: Persistencia histórica sanitizada por máquina
-Las muestras de cuota SHALL persistirse dentro del snapshot diario de la máquina que las obtuvo y MUST contener solo proveedor, instante, porcentaje, plan y renovación. El histórico MUST poder reconstruir la evolución temporal sin login, identidad de cuenta ni payload original.
+Las muestras de cuota SHALL persistirse dentro del snapshot diario de la máquina que las obtuvo y MUST contener solo proveedor, fecha local sin hora, porcentaje, plan y renovación. El histórico MUST poder reconstruir la evolución temporal sin login, identidad de cuenta ni payload original.
 
 #### Scenario: Historial de varios días
 - **WHEN** una máquina publica muestras de Copilot en días sucesivos
-- **THEN** la capa local puede ordenar sus porcentajes y renovaciones por instante a través de los snapshots diarios
+- **THEN** la capa local puede ordenar sus porcentajes y renovaciones por fecha a través de los snapshots diarios
 
 #### Scenario: Datos privados presentes en origen
 - **WHEN** la respuesta original contiene login y campos adicionales
@@ -14,10 +14,10 @@ Las muestras de cuota SHALL persistirse dentro del snapshot diario de la máquin
 ## MODIFIED Requirements
 
 ### Requirement: API de lectura de snapshots deduplicada por cuenta
-La capa local SHALL leer las cuotas dentro del rango filtrado y agruparlas por máquina y proveedor. Por cada grupo SHALL devolver la muestra más reciente y la serie temporal de porcentajes, deduplicando muestras idénticas por instante sin usar ni inferir una cuenta.
+La capa local SHALL leer las cuotas dentro del rango filtrado y agruparlas por máquina y proveedor. Por cada grupo SHALL devolver la muestra más reciente y la serie temporal de porcentajes, deduplicando muestras idénticas por fecha sin usar ni inferir una cuenta.
 
 #### Scenario: Misma cuota de una máquina repetida
-- **WHEN** el conjunto contiene dos muestras equivalentes de la misma máquina, proveedor e instante
+- **WHEN** el conjunto contiene dos muestras equivalentes de la misma máquina, proveedor y fecha
 - **THEN** la serie local contiene un único punto
 
 #### Scenario: Tres identidades con Copilot
@@ -48,7 +48,7 @@ La capa local SHALL leer las cuotas dentro del rango filtrado y agruparlas por m
 
 ### Requirement: Dedup blando por máquina y proveedor
 **Reason**: La captura es diaria y la unicidad se valida en el fichero canónico, sin reloj de servidor.
-**Migration**: Deduplicar localmente por máquina, proveedor e instante y no escribir más de una representación equivalente.
+**Migration**: Deduplicar localmente por máquina, proveedor y fecha local y no escribir más de una representación equivalente.
 
 #### Scenario: Muestra repetida localmente
 - **WHEN** una ejecución intenta incorporar dos veces la misma muestra

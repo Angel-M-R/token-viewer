@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import {
   useAvailableFilters,
   useDaily,
-  useHeatmap,
   useMachines,
   useModels,
   useQuotaSnapshots,
@@ -13,7 +12,6 @@ import { previousPeriod, resolveApiFilters, resolveDateRange } from "./filters/p
 import { useFilters } from "./filters/useFilters";
 import { DailyChart } from "./features/daily/DailyChart";
 import { CalendarHeatmap } from "./features/heatmap/CalendarHeatmap";
-import { HourlyHeatmap } from "./features/heatmap/HourlyHeatmap";
 import { ModelsTable } from "./features/models/ModelsTable";
 import { CopilotQuotaCards } from "./features/quota/CopilotQuotaCards";
 import { SummaryCards } from "./features/summary/SummaryCards";
@@ -51,8 +49,6 @@ function Dashboard({ theme }: { theme: ThemeName }) {
   const dailyMachine = useDaily(apiFilters, "machine");
   const dailyAgentOptions = useDaily(optionFilters, "agent");
   const dailyCalendar = useDaily(apiFilters, "none");
-  const heatmap = useHeatmap(apiFilters, filters.heatmapMetric, browserTimeZone());
-  const heatmapRequests = useHeatmap(apiFilters, "requests", browserTimeZone());
   const models = useModels(apiFilters);
   const quota = useQuotaSnapshots(apiFilters, "copilot");
   const modelOptions = useModels(modelOptionFilters);
@@ -111,13 +107,6 @@ function Dashboard({ theme }: { theme: ThemeName }) {
           onGroupByChange={(dailyGroupBy) => setFilters({ dailyGroupBy })}
           onMetricChange={(dailyMetric) => setFilters({ dailyMetric })}
         />
-        <HourlyHeatmap
-          data={heatmap.data}
-          requests={heatmapRequests.data}
-          theme={theme}
-          isLoading={heatmap.isPending}
-          error={heatmap.error}
-        />
         <CalendarHeatmap
           data={dailyCalendar.data}
           metric={filters.heatmapMetric}
@@ -130,10 +119,6 @@ function Dashboard({ theme }: { theme: ThemeName }) {
       </div>
     </main>
   );
-}
-
-function browserTimeZone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 }
 
 function unique(values: string[]): string[] {

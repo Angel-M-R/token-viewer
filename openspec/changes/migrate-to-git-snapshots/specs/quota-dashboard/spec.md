@@ -16,11 +16,11 @@ El dashboard SHALL mostrar en la vista de resumen una card de cuota de Copilot p
 - **THEN** la card muestra el gauge y un marcador vacío en los días hasta renovación
 
 ### Requirement: Deduplicación por cuenta en la visualización
-La visualización de cuota SHALL agrupar por máquina y proveedor, no por cuenta: muestras equivalentes de la misma máquina, proveedor e instante MUST mostrarse una vez, y muestras de máquinas distintas MUST permanecer separadas. El dashboard MUST NOT deducir una cuenta desde otros datos.
+La visualización de cuota SHALL agrupar por máquina y proveedor, no por cuenta: muestras equivalentes de la misma máquina, proveedor y fecha MUST mostrarse una vez, y muestras de máquinas distintas MUST permanecer separadas. El dashboard MUST NOT deducir una cuenta desde otros datos.
 
 #### Scenario: Muestras repetidas de una máquina
 - **WHEN** la capa local recibe puntos equivalentes de `angel-mac` y Copilot
-- **THEN** muestra una sola card y un solo punto para ese instante
+- **THEN** muestra una sola card y un solo punto para esa fecha
 
 #### Scenario: Identidades distintas
 - **WHEN** `angel-mac`, `old-mac` y `mac-m5` tienen muestras de Copilot
@@ -31,7 +31,7 @@ Cada card de Copilot SHALL incluir una sparkline con la evolución de `percentUs
 
 #### Scenario: Evolución en el periodo
 - **WHEN** una máquina tiene varias muestras en el rango
-- **THEN** la sparkline dibuja los porcentajes ordenados por `takenAt`
+- **THEN** la sparkline dibuja los porcentajes ordenados por la fecha de `takenAt`
 
 #### Scenario: Cambio de filtros globales
 - **WHEN** el usuario cambia rango o filtro de máquina

@@ -1,14 +1,13 @@
 import type {
   MachineListItem,
   StatsDailyResponse,
-  StatsHeatmapResponse,
   StatsModelsResponse,
   StatsSummaryResponse,
 } from "@tokenviewer/core/schemas";
 import {
   ALLOWED_MACHINES,
   type AllowedMachine,
-  type HourlyUsageRow,
+  type DailyUsageRow,
   type SanitizedQuotaSample,
   type SnapshotTotals,
   type ValidatedSnapshotFile,
@@ -35,7 +34,7 @@ export interface AvailableFilters {
 export type DailyGroupBy = "none" | "agent" | "model" | "machine";
 export type HeatmapMetric = "tokens" | "cost" | "requests";
 
-interface LocalUsageRow extends HourlyUsageRow {
+interface LocalUsageRow extends DailyUsageRow {
   date: string;
   machine: AllowedMachine;
 }
@@ -61,16 +60,6 @@ export class InvalidLocalQueryError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "InvalidLocalQueryError";
-  }
-}
-
-export class InvalidTimeZoneError extends InvalidLocalQueryError {
-  readonly timeZone: string;
-
-  constructor(timeZone: string) {
-    super(`Invalid IANA timezone: ${timeZone}`);
-    this.name = "InvalidTimeZoneError";
-    this.timeZone = timeZone;
   }
 }
 
@@ -157,28 +146,6 @@ export class LocalSnapshotRepository {
     };
   }
 
-  queryHourlyHeatmap(
-    filters: LocalFilters = {},
-    metric: HeatmapMetric = "tokens",
-    timeZone = "UTC",
-  ): StatsHeatmapResponse {
-    const formatter = timeZoneFormatter(timeZone);
-    const matrix = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
-    for (const row of this.#filteredUsage(filters)) {
-      const parts = Object.fromEntries(
-        formatter.formatToParts(new Date(row.hour)).map((part) => [part.type, part.value]),
-      );
-      const weekday = WEEKDAY_INDEX[parts.weekday ?? ""];
-      const hour = Number(parts.hour);
-      if (weekday === undefined || !Number.isInteger(hour) || hour < 0 || hour > 23) {
-        throw new InvalidTimeZoneError(timeZone);
-      }
-      const day = matrix[weekday];
-      if (day) day[hour] = (day[hour] ?? 0) + heatmapValue(row, metric);
-    }
-    return { metric, tz: timeZone, matrix };
-  }
-
   queryQuotas(filters: LocalFilters = {}, provider = "copilot"): LocalQuotaSnapshotsResponse {
     const groupedSamples = new Map<string, Map<string, LocalQuotaSample>>();
     for (const sample of this.#filteredQuota(filters).filter((item) => item.provider === provider)) {
@@ -226,7 +193,7 @@ export class LocalSnapshotRepository {
       const usage = this.#usage.filter((row) => row.machine === machine);
       const totals = sumMetrics(usage);
       const generated = files.map((file) => file.snapshot.generatedAt).sort(compareStrings);
-      const lastSeen = usage.map((row) => row.hour).sort(compareStrings).at(-1) ?? generated.at(-1) ?? null;
+      const lastSeen = usage.map((row) => row.date).sort(compareStrings).at(-1) ?? generated.at(-1) ?? null;
       return [{
         id: index + 1,
         name: machine,
@@ -361,35 +328,6 @@ function addDailyMetrics(
   target.cacheWriteTokens += source.cacheWriteTokens;
   target.estimatedCost += source.estimatedCost;
   target.billedCost += source.billedCost;
-}
-
-function heatmapValue(row: HourlyUsageRow, metric: HeatmapMetric): number {
-  if (metric === "cost") return row.estimatedCost;
-  if (metric === "requests") return row.requests;
-  return row.inputTokens + row.outputTokens + row.reasoningTokens + row.cacheReadTokens + row.cacheWriteTokens;
-}
-
-const WEEKDAY_INDEX: Record<string, number> = {
-  Sun: 0,
-  Mon: 1,
-  Tue: 2,
-  Wed: 3,
-  Thu: 4,
-  Fri: 5,
-  Sat: 6,
-};
-
-function timeZoneFormatter(timeZone: string): Intl.DateTimeFormat {
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      weekday: "short",
-      hour: "2-digit",
-      hourCycle: "h23",
-    });
-  } catch {
-    throw new InvalidTimeZoneError(timeZone);
-  }
 }
 
 function unique<T extends string>(values: readonly T[]): T[] {

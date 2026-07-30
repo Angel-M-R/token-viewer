@@ -18,7 +18,7 @@
 
 ### Requirement: docker-compose con persistencia
 **Reason**: Docker, servidor y SQLite propia se eliminan tras validar el snapshot completo.
-**Migration**: Sustituir compose por el checkout operativo, el job diario de `launchd` y snapshots Git; conservar la SQLite anterior solo como copia offline no versionada para rollback.
+**Migration**: Sustituir compose por el checkout operativo, el job diario de `launchd` y snapshots Git; la salvaguarda de reversión es una copia offline no versionada del repositorio previo a la reescritura de historial, no una copia de la SQLite anterior, que ya no existe.
 
 #### Scenario: Operación posterior al corte
 - **WHEN** `angel-mac` y `mac-m5` ejecutan el flujo diario validado y `old-mac` permanece histórica

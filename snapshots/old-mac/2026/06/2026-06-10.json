@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2026-06-10",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5",
+      "requests": 222,
+      "inputTokens": 47376,
+      "outputTokens": 176578,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 21329650,
+      "cacheWriteTokens": 499593,
+      "estimatedCost": 36.8772225,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "requests": 313,
+      "inputTokens": 2524,
+      "outputTokens": 48176,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 9742362,
+      "cacheWriteTokens": 388755,
+      "estimatedCost": 1.70358395,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "gpt-5.5",
+      "requests": 124,
+      "inputTokens": 555749,
+      "outputTokens": 26692,
+      "reasoningTokens": 2559,
+      "cacheReadTokens": 6019072,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 6.665811,
+      "billedCost": 6.665811,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 659,
+    "inputTokens": 605649,
+    "outputTokens": 251446,
+    "reasoningTokens": 2559,
+    "cacheReadTokens": 37091084,
+    "cacheWriteTokens": 888348,
+    "estimatedCost": 45.24661745,
+    "billedCost": 6.665811,
+    "unpricedRequests": 0
+  }
+}

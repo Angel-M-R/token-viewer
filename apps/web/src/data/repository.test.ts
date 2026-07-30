@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { localQuotaSnapshotsResponseSchema } from "./contracts";
 import { loadSnapshotModules } from "./snapshotLoader";
-import {
-  InvalidLocalQueryError,
-  InvalidTimeZoneError,
-  LocalSnapshotRepository,
-} from "./repository";
+import { InvalidLocalQueryError, LocalSnapshotRepository } from "./repository";
 import { representativeRepository, representativeSnapshotModules } from "./testFixtures";
 
 describe("local snapshot repository", () => {
@@ -13,7 +9,7 @@ describe("local snapshot repository", () => {
     const repository = representativeRepository();
 
     expect(repository.queryAvailableFilters()).toEqual({
-      machines: ["angel-mac", "old-mac", "mac-m5"],
+      machines: ["angel-mac", "mac-m5", "old-mac"],
       agents: ["claude", "codex"],
       providers: ["anthropic", "copilot", "openai"],
       models: ["claude-opus", "gpt-5", "unknown"],
@@ -55,14 +51,13 @@ describe("local snapshot repository", () => {
       expect(sum(repository.queryDaily(filters, "machine").rows.map((row) => row.requests))).toBe(requests);
       expect(sum(repository.queryCalendarHeatmap(filters).rows.map((row) => row.requests))).toBe(requests);
       expect(sum(repository.queryModels(filters).rows.map((row) => row.requests))).toBe(requests);
-      expect(sum(repository.queryHourlyHeatmap(filters, "requests", "UTC").matrix.flat())).toBe(requests);
       expect(repository.queryQuotas(filters).groups.map((group) => group.machine)).toEqual([machine]);
     }
 
     expect(repository.queryDaily({}, "agent").rows).toHaveLength(3);
     expect(repository.queryCalendarHeatmap().rows).toHaveLength(2);
     expect(repository.queryModels().rows).toHaveLength(3);
-    expect(repository.queryHourlyHeatmap({}, "requests", "UTC").matrix[6]?.[10]).toBe(4);
+    expect("queryHourlyHeatmap" in repository).toBe(false);
   });
 
   it("returns zeroed aggregates for an empty range and controls invalid ranges", () => {
@@ -86,20 +81,6 @@ describe("local snapshot repository", () => {
     );
   });
 
-  it("converts UTC hourly rows to an IANA timezone and rejects invalid zones", () => {
-    const repository = representativeRepository();
-    const heatmap = repository.queryHourlyHeatmap(
-      { machine: ["angel-mac"], agent: ["codex"], from: "2026-07-04", to: "2026-07-04" },
-      "requests",
-      "Europe/Madrid",
-    );
-
-    expect(heatmap.matrix[0]?.[1]).toBe(2);
-    expect(() => repository.queryHourlyHeatmap({}, "tokens", "Mars/Olympus")).toThrow(
-      InvalidTimeZoneError,
-    );
-  });
-
   it("groups quotas by machine and provider with latest values and deduplicated history", () => {
     const files = loadSnapshotModules(representativeSnapshotModules);
     const repository = new LocalSnapshotRepository([...files, files[0]!]);
@@ -108,8 +89,8 @@ describe("local snapshot repository", () => {
     expect(localQuotaSnapshotsResponseSchema.parse(response)).toEqual(response);
     expect(response.groups.map((group) => group.machine)).toEqual([
       "angel-mac",
-      "old-mac",
       "mac-m5",
+      "old-mac",
     ]);
     expect(response.groups[0]?.latest.percentUsed).toBe(60);
     expect(response.groups[0]?.series).toHaveLength(2);

@@ -1,5 +1,5 @@
 import { execFile as execFileCallback } from "node:child_process";
-import { access, chmod, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { access, chmod, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it } from "vitest";
 const execFile = promisify(execFileCallback);
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const installer = join(repositoryRoot, "ops", "macos", "install-launchd.mjs");
+const dailyRunner = join(repositoryRoot, "ops", "macos", "run-daily-publisher.mjs");
 const temporaryRoots: string[] = [];
 
 afterEach(async () => {
@@ -67,6 +68,8 @@ describe.sequential("launchd installer", () => {
     expect(result.stdout).toContain("<key>WorkingDirectory</key>");
     expect(result.stdout).toContain("<key>PATH</key>");
     expect(result.stdout).toContain("<key>StartCalendarInterval</key>");
+    expect(result.stdout).toContain("run-daily-publisher.mjs");
+    expect(result.stdout).toContain("<string>--checkout</string>");
     expect(result.stdout).toContain("<integer>7</integer>");
     expect(result.stdout).toContain("<integer>30</integer>");
     expect(result.stdout).toContain(`Library/Logs/TokenViewer/${machine}.out.log`);
@@ -138,6 +141,41 @@ describe.sequential("launchd installer", () => {
     ]).catch((error: { stderr?: string }) => error);
 
     expect(result.stderr).toContain("angel-mac or mac-m5");
+  });
+
+  it("pulls, rebuilds the collector dependency graph, then publishes", async () => {
+    const root = await mkdtemp(join(tmpdir(), "tv-daily-runner-"));
+    temporaryRoots.push(root);
+    const checkout = join(root, "operational checkout");
+    const fakeBin = join(root, "bin");
+    const commandLog = join(root, "commands.log");
+    await mkdir(checkout, { recursive: true });
+    await mkdir(fakeBin, { recursive: true });
+    for (const command of ["git", "pnpm"]) {
+      const executable = join(fakeBin, command);
+      await writeFile(
+        executable,
+        `#!/bin/sh\nprintf '%s:%s\\n' '${command}' "$*" >> "$COMMAND_LOG"\n`,
+        "utf8",
+      );
+      await chmod(executable, 0o755);
+    }
+
+    await execFile(process.execPath, [dailyRunner, "--checkout", checkout], {
+      cwd: repositoryRoot,
+      env: {
+        ...process.env,
+        PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
+        COMMAND_LOG: commandLog,
+      },
+    });
+
+    const canonicalCheckout = await realpath(checkout);
+    expect((await readFile(commandLog, "utf8")).trim().split("\n")).toEqual([
+      `git:-C ${canonicalCheckout} pull --rebase origin master`,
+      `pnpm:--dir ${canonicalCheckout} --filter collector... build`,
+      `pnpm:--dir ${canonicalCheckout} --filter collector publish`,
+    ]);
   });
 });
 

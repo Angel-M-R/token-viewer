@@ -1,6 +1,7 @@
 import { mkdir, open, readFile, rename, rm, stat } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
+import { localSnapshotDate } from "./local-day.js";
 import type { PricingCatalog } from "./pricing.js";
 import {
   SNAPSHOT_SCHEMA_VERSION,
@@ -116,12 +117,13 @@ export async function planDailySnapshots(
   const availableSourceDates = discoverAvailableSourceDates(records);
   const aggregation = aggregateUsageRecords(records, options.machine, options.pricing);
   const aggregates = new Map(aggregation.days.map((day) => [day.date, day]));
-  const openDate = now.toISOString().slice(0, 10);
+  const openDate = localSnapshotDate(now);
+  if (!openDate) throw new TypeError("now must be a valid date");
   const repairDates = new Set(options.repairClosedDates ?? []);
   const dates = new Set(availableSourceDates);
   const quotaSamples = [...(options.quotaSamples ?? [])];
 
-  for (const sample of quotaSamples) dates.add(sample.takenAt.slice(0, 10));
+  for (const sample of quotaSamples) dates.add(sample.takenAt);
 
   if (await snapshotExists(options.repositoryRoot, options.machine, openDate)) dates.add(openDate);
   for (const date of repairDates) {
@@ -151,7 +153,7 @@ export async function planDailySnapshots(
       usage: [...aggregate.usage],
       quotaSamples: mergeQuotaSamples(
         existing?.quotaSamples ?? [],
-        quotaSamples.filter((sample) => sample.takenAt.startsWith(`${date}T`)),
+        quotaSamples.filter((sample) => sample.takenAt === date),
       ),
       totals: aggregate.totals,
     };

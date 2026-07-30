@@ -19,14 +19,14 @@ describe("daily snapshot generation", () => {
   it("performs a deterministic first backfill using only canonical machine paths", async () => {
     const root = await temporaryRoot();
     await writeFile(join(root, "collector-state.json"), "{corrupt", "utf8");
-    const records = [record("late", "2026-07-27T20:00:00.000Z"), record("early", "2026-07-25T01:00:00.000Z")];
+    const records = [record("late", "2026-07-27T18:00:00.000Z"), record("early", "2026-07-25T01:00:00.000Z")];
 
     const first = await generateDailySnapshots({
       repositoryRoot: root,
       machine: "angel-mac",
       records,
       pricing: PRICING,
-      now: new Date("2026-07-27T23:00:00.000Z"),
+      now: new Date("2026-07-27T21:00:00.000Z"),
     });
 
     expect(first.availableSourceDates).toEqual(["2026-07-25", "2026-07-27"]);
@@ -44,7 +44,7 @@ describe("daily snapshot generation", () => {
       machine: "angel-mac",
       records,
       pricing: PRICING,
-      now: new Date("2026-07-27T23:30:00.000Z"),
+      now: new Date("2026-07-27T21:30:00.000Z"),
     });
     expect(rerun).toMatchObject({
       writtenDates: [],
@@ -59,7 +59,7 @@ describe("daily snapshot generation", () => {
       machine: "angel-mac",
       records,
       pricing: PRICING,
-      now: new Date("2026-07-27T23:45:00.000Z"),
+      now: new Date("2026-07-27T21:45:00.000Z"),
     });
     expect(withoutState.writtenDates).toEqual([]);
   });
@@ -90,7 +90,7 @@ describe("daily snapshot generation", () => {
     expect(result.protectedClosedDates).toEqual(["2026-07-25", "2026-07-27"]);
   });
 
-  it("regenerates the open UTC day while protecting closed days", async () => {
+  it("regenerates the open Europe/Madrid day while protecting closed days", async () => {
     const root = await temporaryRoot();
     const initial = [record("closed", "2026-07-26T10:00:00.000Z"), record("open", "2026-07-27T10:00:00.000Z")];
     await generateDailySnapshots({
@@ -128,6 +128,31 @@ describe("daily snapshot generation", () => {
     });
     expect(repaired.writtenDates).toEqual(["2026-07-26"]);
     expect(await inputTokens(root, "2026-07-26")).toBe(99);
+  });
+
+  it("derives the open day from Europe/Madrid rather than UTC", async () => {
+    const root = await temporaryRoot();
+    const records = [record("boundary", "2026-07-27T22:30:00.000Z")];
+
+    const first = await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records,
+      pricing: PRICING,
+      now: new Date("2026-07-27T22:45:00.000Z"),
+    });
+
+    expect(first.writtenDates).toEqual(["2026-07-28"]);
+
+    const rerun = await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records,
+      pricing: PRICING,
+      now: new Date("2026-07-27T23:15:00.000Z"),
+    });
+
+    expect(rerun).toMatchObject({ writtenDates: [], unchangedDates: ["2026-07-28"] });
   });
 });
 

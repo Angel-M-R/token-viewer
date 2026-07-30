@@ -65,7 +65,7 @@ describe.sequential("collector local snapshots", () => {
     expect(validateSnapshotSet([{ path: relativePath, value: snapshot }])[0]?.snapshot.quotaSamples).toEqual([
       {
         provider: "copilot",
-        takenAt: "2026-07-05T12:00:00.000Z",
+        takenAt: "2026-07-05",
         percentUsed: 51,
         plan: "Pro",
         resetsAt: "2026-08-01T00:00:00.000Z",

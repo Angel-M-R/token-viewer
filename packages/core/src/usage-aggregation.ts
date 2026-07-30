@@ -1,16 +1,17 @@
+import { localSnapshotDate } from "./local-day.js";
 import { priceUsageRecord, type PricingCatalog } from "./pricing.js";
 import {
   UNKNOWN_DIMENSION,
   allowedMachineSchema,
   type AllowedMachine,
-  type HourlyUsageRow,
+  type DailyUsageRow,
   type SnapshotTotals,
 } from "./snapshots.js";
 import type { UsageRecord } from "./types.js";
 
 export interface DailyUsageAggregate {
   date: string;
-  usage: readonly HourlyUsageRow[];
+  usage: readonly DailyUsageRow[];
   totals: SnapshotTotals;
 }
 
@@ -24,7 +25,7 @@ export interface UsageAggregationResult {
 type MutableMetrics = SnapshotTotals;
 
 interface MutableRow extends MutableMetrics {
-  hour: string;
+  date: string;
   agent: string;
   provider: string;
   model: string;
@@ -48,8 +49,8 @@ export function aggregateUsageRecords(
     }
     seenHashes.add(record.recordHash);
 
-    const hour = toUtcHour(record.timestamp);
-    if (!hour) {
+    const date = localSnapshotDate(record.timestamp);
+    if (!date) {
       skippedRecords += 1;
       continue;
     }
@@ -57,11 +58,11 @@ export function aggregateUsageRecords(
     const agent = normalizeDimension(record.agent);
     const provider = normalizeDimension(record.provider);
     const model = normalizeDimension(record.model);
-    const key = JSON.stringify([hour, agent, provider, model]);
+    const key = JSON.stringify([date, agent, provider, model]);
     let row = rows.get(key);
     if (!row) {
       row = {
-        hour,
+        date,
         agent,
         provider,
         model,
@@ -82,9 +83,8 @@ export function aggregateUsageRecords(
     row.unpricedRequests += priced.costUsd === null ? 1 : 0;
   }
 
-  const rowsByDate = new Map<string, HourlyUsageRow[]>();
-  for (const row of [...rows.values()].sort(compareRows)) {
-    const date = row.hour.slice(0, 10);
+  const rowsByDate = new Map<string, DailyUsageRow[]>();
+  for (const { date, ...row } of [...rows.values()].sort(compareRows)) {
     const dailyRows = rowsByDate.get(date) ?? [];
     dailyRows.push(row);
     rowsByDate.set(date, dailyRows);
@@ -105,18 +105,10 @@ export function aggregateUsageRecords(
 export function discoverAvailableSourceDates(records: Iterable<UsageRecord>): readonly string[] {
   const dates = new Set<string>();
   for (const record of records) {
-    const hour = toUtcHour(record.timestamp);
-    if (hour) dates.add(hour.slice(0, 10));
+    const date = localSnapshotDate(record.timestamp);
+    if (date) dates.add(date);
   }
   return [...dates].sort(compareStrings);
-}
-
-function toUtcHour(timestamp: string | undefined): string | null {
-  if (!timestamp) return null;
-  const instant = new Date(timestamp);
-  if (!Number.isFinite(instant.getTime())) return null;
-  instant.setUTCMinutes(0, 0, 0);
-  return instant.toISOString();
 }
 
 function normalizeDimension(value: string | undefined): string {
@@ -142,7 +134,7 @@ function emptyMetrics(): MutableMetrics {
   };
 }
 
-function sumMetrics(rows: readonly HourlyUsageRow[]): SnapshotTotals {
+function sumMetrics(rows: readonly DailyUsageRow[]): SnapshotTotals {
   const totals = emptyMetrics();
   for (const row of rows) {
     totals.requests += row.requests;
@@ -160,8 +152,8 @@ function sumMetrics(rows: readonly HourlyUsageRow[]): SnapshotTotals {
 
 function compareRows(left: MutableRow, right: MutableRow): number {
   return compareStrings(
-    JSON.stringify([left.hour, left.agent, left.provider, left.model]),
-    JSON.stringify([right.hour, right.agent, right.provider, right.model]),
+    JSON.stringify([left.date, left.agent, left.provider, left.model]),
+    JSON.stringify([right.date, right.agent, right.provider, right.model]),
   );
 }
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SNAPSHOT_SCHEMA_VERSION = 1 as const;
+export const SNAPSHOT_SCHEMA_VERSION = 2 as const;
 export const SNAPSHOT_MACHINES = ["angel-mac", "old-mac", "mac-m5"] as const;
 export const ACTIVE_PUBLISHER_MACHINES = ["angel-mac", "mac-m5"] as const;
 export const UNKNOWN_DIMENSION = "unknown" as const;
@@ -14,7 +14,6 @@ export const canonicalUnknownDimensionSchema = z.literal(UNKNOWN_DIMENSION);
 const nonNegativeIntegerSchema = z.number().finite().int().nonnegative();
 const nonNegativeNumberSchema = z.number().finite().nonnegative();
 const utcInstantSchema = z.string().datetime({ offset: false });
-const utcHourSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):00:00\.000Z$/);
 const snapshotDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const dimensionSchema = z.string().min(1);
 
@@ -32,9 +31,8 @@ const aggregateMetricsShape = {
 
 export const snapshotTotalsSchema = z.object(aggregateMetricsShape).strict();
 
-export const hourlyUsageRowSchema = z
+export const dailyUsageRowSchema = z
   .object({
-    hour: utcHourSchema,
     agent: dimensionSchema,
     provider: dimensionSchema,
     model: dimensionSchema,
@@ -45,7 +43,7 @@ export const hourlyUsageRowSchema = z
 export const sanitizedQuotaSampleSchema = z
   .object({
     provider: dimensionSchema,
-    takenAt: utcInstantSchema,
+    takenAt: snapshotDateSchema,
     percentUsed: z.number().finite().min(0).max(100).nullable().optional(),
     plan: z.string().min(1).nullable().optional(),
     resetsAt: utcInstantSchema.nullable().optional(),
@@ -58,7 +56,7 @@ export const dailySnapshotSchema = z
     machine: snapshotMachineSchema,
     date: snapshotDateSchema,
     generatedAt: utcInstantSchema,
-    usage: z.array(hourlyUsageRowSchema),
+    usage: z.array(dailyUsageRowSchema),
     quotaSamples: z.array(sanitizedQuotaSampleSchema),
     totals: snapshotTotalsSchema.optional(),
   })
@@ -69,7 +67,7 @@ export type ActivePublisherMachine = z.infer<typeof activePublisherMachineSchema
 export type AllowedMachine = SnapshotMachine;
 export type CanonicalUnknownDimension = z.infer<typeof canonicalUnknownDimensionSchema>;
 export type SnapshotTotals = z.infer<typeof snapshotTotalsSchema>;
-export type HourlyUsageRow = z.infer<typeof hourlyUsageRowSchema>;
+export type DailyUsageRow = z.infer<typeof dailyUsageRowSchema>;
 export type SanitizedQuotaSample = z.infer<typeof sanitizedQuotaSampleSchema>;
 export type DailySnapshot = z.infer<typeof dailySnapshotSchema>;
 
@@ -120,6 +118,8 @@ const FORBIDDEN_PROPERTY_NAMES = new Set([
   "credentials",
   "email",
   "filepath",
+  "hour",
+  "hours",
   "login",
   "machinetoken",
   "message",
@@ -284,15 +284,7 @@ function validateSnapshotInvariants(
   const aggregateKeys = new Set<string>();
   let previousUsageKey: readonly string[] | undefined;
   for (const [index, row] of snapshot.usage.entries()) {
-    if (!row.hour.startsWith(`${snapshot.date}T`)) {
-      issues.push({
-        code: "usage_outside_snapshot_date",
-        path: parsedPath.path,
-        property: `usage.${index}.hour`,
-      });
-    }
-
-    const keyParts = [row.hour, row.agent, row.provider, row.model] as const;
+    const keyParts = [row.agent, row.provider, row.model] as const;
     const key = JSON.stringify(keyParts);
     if (aggregateKeys.has(key)) {
       issues.push({ code: "duplicate_aggregate_key", path: parsedPath.path, property: `usage.${index}` });
@@ -307,7 +299,7 @@ function validateSnapshotInvariants(
 
   let previousQuotaKey: readonly string[] | undefined;
   for (const [index, sample] of snapshot.quotaSamples.entries()) {
-    if (!sample.takenAt.startsWith(`${snapshot.date}T`)) {
+    if (sample.takenAt !== snapshot.date) {
       issues.push({
         code: "quota_outside_snapshot_date",
         path: parsedPath.path,

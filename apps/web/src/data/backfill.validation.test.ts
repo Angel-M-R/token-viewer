@@ -21,7 +21,8 @@ describe("complete historical backfill dashboard validation", () => {
       file.snapshot.usage.map((row) => ({ ...row, date: file.date, machine: file.machine })),
     );
 
-    expect(files).toHaveLength(311);
+    // 313 migrated schema v2 daily snapshots plus the representative `mac-m5` fixture.
+    expect(files).toHaveLength(314);
     expect(new Set(files.map((file) => file.machine))).toEqual(
       new Set(["angel-mac", "old-mac", "mac-m5"]),
     );
@@ -40,14 +41,6 @@ describe("complete historical backfill dashboard validation", () => {
     }
     expect(sum(repository.queryCalendarHeatmap().rows.map((row) => row.requests))).toBe(summary.requests);
     expect(sum(repository.queryModels().rows.map((row) => row.requests))).toBe(summary.requests);
-    expect(sumMatrix(repository.queryHourlyHeatmap({}, "requests", "UTC").matrix)).toBe(summary.requests);
-    expect(sumMatrix(repository.queryHourlyHeatmap({}, "tokens", "Europe/Madrid").matrix)).toBe(
-      totalTokens(expected),
-    );
-    expect(sumMatrix(repository.queryHourlyHeatmap({}, "cost", "UTC").matrix)).toBeCloseTo(
-      expected.estimatedCost,
-      10,
-    );
     const quotaGroups = repository.queryQuotas({}, "copilot").groups;
     expect(quotaGroups).toHaveLength(1);
     expect(quotaGroups[0]).toMatchObject({ machine: "mac-m5", provider: "copilot" });
@@ -148,14 +141,6 @@ function expectSummary(actual: SnapshotTotals, expected: SnapshotTotals): void {
   expect(actual.unpricedRequests).toBe(expected.unpricedRequests);
 }
 
-function totalTokens(totals: SnapshotTotals): number {
-  return totals.inputTokens + totals.outputTokens + totals.reasoningTokens + totals.cacheReadTokens + totals.cacheWriteTokens;
-}
-
 function sum(values: readonly number[]): number {
   return values.reduce((total, value) => total + value, 0);
-}
-
-function sumMatrix(matrix: readonly (readonly number[])[]): number {
-  return sum(matrix.flat());
 }

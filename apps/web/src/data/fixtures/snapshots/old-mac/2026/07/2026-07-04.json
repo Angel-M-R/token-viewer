@@ -1,11 +1,10 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "machine": "old-mac",
   "date": "2026-07-04",
   "generatedAt": "2026-07-05T00:10:00.000Z",
   "usage": [
     {
-      "hour": "2026-07-04T10:00:00.000Z",
       "agent": "claude",
       "provider": "anthropic",
       "model": "claude-opus",
@@ -23,7 +22,7 @@
   "quotaSamples": [
     {
       "provider": "copilot",
-      "takenAt": "2026-07-04T12:30:00.000Z",
+      "takenAt": "2026-07-04",
       "percentUsed": 20,
       "plan": "Business",
       "resetsAt": null

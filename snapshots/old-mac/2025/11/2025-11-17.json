@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2025-11-17",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.1-codex",
+      "requests": 219,
+      "inputTokens": 587881,
+      "outputTokens": 34291,
+      "reasoningTokens": 26432,
+      "cacheReadTokens": 6430464,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 2.1458892499999997,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 219,
+    "inputTokens": 587881,
+    "outputTokens": 34291,
+    "reasoningTokens": 26432,
+    "cacheReadTokens": 6430464,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 2.1458892499999997,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

@@ -1,4 +1,4 @@
-import { sanitizedQuotaSampleSchema, type SanitizedQuotaSample } from "@tokenviewer/core";
+import { localSnapshotDate, sanitizedQuotaSampleSchema, type SanitizedQuotaSample } from "@tokenviewer/core";
 
 export const COPILOT_INTERNAL_USER_URL = "https://api.github.com/copilot_internal/user";
 export const COPILOT_HEADERS = {
@@ -33,7 +33,7 @@ export async function fetchCopilotQuotaSample(
   const raw = (await response.json()) as Record<string, unknown>;
   return sanitizedQuotaSampleSchema.parse({
     provider: "copilot",
-    takenAt: (options.now ?? new Date()).toISOString(),
+    takenAt: localSnapshotDate(options.now ?? new Date()),
     percentUsed: quotaPercent(raw),
     plan: stringValue(raw["plan"]) ?? stringValue(raw["sku"]) ?? stringValue(recordValue(raw["copilot_plan"])?.["name"]),
     resetsAt: resetValue(raw),

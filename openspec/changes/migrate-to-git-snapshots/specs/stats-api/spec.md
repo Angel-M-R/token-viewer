@@ -1,7 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Filtros comunes y agregación en SQL
-Todas las consultas locales de estadísticas SHALL aceptar los filtros comunes `machine`, `agent`, `provider`, `model` y rango de fechas, validarlos y aplicarlos sobre las filas horarias cargadas. La agregación MUST ejecutarse en la capa local del dashboard sin SQL, servidor ni autenticación Bearer, y MUST conservar una experiencia interactiva con el histórico disponible de `angel-mac`, la `old-mac` retirada y `mac-m5`.
+Todas las consultas locales de estadísticas SHALL aceptar los filtros comunes `machine`, `agent`, `provider`, `model` y rango de fechas, validarlos y aplicarlos sobre las filas diarias cargadas. La agregación MUST ejecutarse en la capa local del dashboard sin SQL, servidor ni autenticación Bearer, y MUST conservar una experiencia interactiva con el histórico disponible de `angel-mac`, la `old-mac` retirada y `mac-m5`.
 
 #### Scenario: Filtros combinados
 - **WHEN** se consulta un rango para `angel-mac` y dos agentes
@@ -12,7 +12,7 @@ Todas las consultas locales de estadísticas SHALL aceptar los filtros comunes `
 - **THEN** la consulta devuelve un error descriptivo sin resultados parciales
 
 ### Requirement: Resumen de totales
-La consulta local de resumen SHALL devolver, para el rango filtrado, tokens por tipo, coste estimado total, coste facturado total, solicitudes, solicitudes sin precio y modelos distintos, sumando los agregados horarios compatibles.
+La consulta local de resumen SHALL devolver, para el rango filtrado, tokens por tipo, coste estimado total, coste facturado total, solicitudes, solicitudes sin precio y modelos distintos, sumando los agregados diarios compatibles.
 
 #### Scenario: Resumen con solicitudes sin precio
 - **WHEN** el rango suma 90 solicitudes valoradas y 10 sin tarifa
@@ -25,19 +25,19 @@ La consulta local de serie diaria SHALL agrupar por fecha los tokens, costes y s
 - **WHEN** el rango contiene actividad de Claude y Codex y se agrupa por agente
 - **THEN** cada día desglosa las métricas de ambos agentes
 
-### Requirement: Heatmap horario con zona horaria
-La consulta local de heatmap SHALL devolver una matriz 7×24 para tokens, coste o solicitudes, transformando cada hora UTC agregada a la zona IANA solicitada antes de agrupar. Una zona inválida MUST producir un error controlado y no se SHALL afirmar precisión inferior a una hora.
+### Requirement: Heatmap calendario diario
+La consulta local de heatmap SHALL devolver una serie de valores diarios para tokens, coste o solicitudes, agrupando directamente por la fecha declarada de cada snapshot sin conversión de zona horaria. La consulta MUST NOT aceptar un parámetro de zona IANA ni devolver una matriz 7×24, y no SHALL afirmar precisión inferior a un día.
 
-#### Scenario: Agrupación por hora local
-- **WHEN** una hora UTC corresponde a miércoles/01 en `Europe/Madrid`
-- **THEN** sus métricas cuentan en la celda miércoles/01
+#### Scenario: Agrupación por fecha local
+- **WHEN** el rango contiene snapshots de varias fechas
+- **THEN** cada entrada del heatmap corresponde a una fecha con su total agregado
 
-#### Scenario: Zona horaria inválida
-- **WHEN** se solicita `Marte/Olympus`
-- **THEN** la consulta local devuelve un error descriptivo
+#### Scenario: Parámetro de zona horaria retirado
+- **WHEN** una llamada incluye un parámetro `tz`
+- **THEN** la consulta local lo rechaza como parámetro no soportado
 
 ### Requirement: Desglose por modelo
-La consulta local de modelos SHALL devolver, para el rango filtrado, proveedor, modelo, solicitudes, tokens por tipo, coste estimado, coste facturado y solicitudes sin precio, combinando filas horarias con la misma dimensión.
+La consulta local de modelos SHALL devolver, para el rango filtrado, proveedor, modelo, solicitudes, tokens por tipo, coste estimado, coste facturado y solicitudes sin precio, combinando filas diarias con la misma dimensión.
 
 #### Scenario: Ranking de modelos
 - **WHEN** el rango contiene varios modelos

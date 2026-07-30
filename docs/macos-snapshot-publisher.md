@@ -2,7 +2,7 @@
 
 The daily publisher is limited to the active identities `angel-mac` and `mac-m5`. Each active Mac must use its own dedicated checkout on `master`, and that checkout must never be used for development. Do not install or activate either job until the migration branch has passed normal review and has been integrated. The retired `old-mac` identity remains valid only for reading its historical snapshots.
 
-Before setup, confirm in the repository host that the expected repository is private. Use a credential-free SSH or HTTPS remote URL; credentials remain in the user's existing Git configuration and macOS Keychain, never in TokenViewer config or the plist.
+Before setup, confirm that the checkout points to the expected repository and that the owner credentials used by both authorized publisher machines have ordinary write access to protected `master`. Use a credential-free SSH or HTTPS remote URL; credentials remain in the user's existing Git configuration and macOS Keychain, never in TokenViewer config or the plist.
 
 ## `angel-mac`
 
@@ -21,6 +21,7 @@ Create a fresh operational checkout directly on `master`, then install dependenc
 ```sh
 git clone --branch master --single-branch "$EXPECTED_REMOTE" "$CHECKOUT"
 pnpm --dir "$CHECKOUT" install --frozen-lockfile
+pnpm --dir "$CHECKOUT" build
 pnpm --dir "$CHECKOUT" --filter collector exec tsx src/cli.ts init \
   --machine-name angel-mac \
   --checkout-path "$CHECKOUT" \
@@ -37,6 +38,7 @@ node "$CHECKOUT/ops/macos/install-launchd.mjs" \
 ```
 
 The installer refuses a non-`master`, dirty, nested, wrong-origin, or mismatched collector checkout.
+Each daily run pulls and rebases `master`, rebuilds the collector and its compiled workspace dependencies, and only then starts snapshot publication.
 
 ### Status and logs
 
@@ -80,7 +82,7 @@ For invalid snapshots, Git conflicts, network loss, expired credentials, or an u
 
 ## `mac-m5`
 
-Use these values on the former-employer M5 Mac:
+Use these values on the M5 Mac:
 
 ```sh
 export CHECKOUT="$HOME/TokenViewer-ops/mac-m5"
@@ -95,6 +97,7 @@ Create a separate fresh operational checkout directly on `master`, then install 
 ```sh
 git clone --branch master --single-branch "$EXPECTED_REMOTE" "$CHECKOUT"
 pnpm --dir "$CHECKOUT" install --frozen-lockfile
+pnpm --dir "$CHECKOUT" build
 pnpm --dir "$CHECKOUT" --filter collector exec tsx src/cli.ts init \
   --machine-name mac-m5 \
   --checkout-path "$CHECKOUT" \
@@ -111,6 +114,7 @@ node "$CHECKOUT/ops/macos/install-launchd.mjs" \
 ```
 
 The installer refuses a non-`master`, dirty, nested, wrong-origin, or mismatched collector checkout.
+Each daily run pulls and rebases `master`, rebuilds the collector and its compiled workspace dependencies, and only then starts snapshot publication.
 
 ### Status and logs
 

@@ -20,7 +20,7 @@ El collector SHALL calcular `costUsd` localmente para cada registro antes de agr
 
 #### Scenario: Modelo presente en catálogo
 - **WHEN** un registro resuelve proveedor, modelo y tarifas
-- **THEN** su coste se calcula antes de sumarlo a la fila horaria y la fila conserva la suma resultante
+- **THEN** su coste se calcula antes de sumarlo a la fila diaria y la fila conserva la suma resultante
 
 #### Scenario: Catálogo actualizado después del cierre
 - **WHEN** models.dev cambia después de publicar un día cerrado

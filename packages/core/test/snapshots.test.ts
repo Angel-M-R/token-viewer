@@ -5,6 +5,7 @@ import {
   parseCanonicalSnapshotPath,
   serializeDailySnapshot,
   SNAPSHOT_MACHINES,
+  SNAPSHOT_SCHEMA_VERSION,
   snapshotMachineSchema,
   SnapshotValidationError,
   type SnapshotSourceFile,
@@ -76,14 +77,29 @@ describe("snapshot contract", () => {
     expectInvalid([wrongDate], "date_path_disagreement");
   });
 
-  it("rejects usage hours and quota samples outside the snapshot date", () => {
-    const usageOutside = angelFile();
-    (usageOutside.value as typeof angelSnapshot).usage[0]!.hour = "2026-07-25T08:00:00.000Z";
-    expectInvalid([usageOutside], "usage_outside_snapshot_date");
+  it("accepts only schema version 2 and rejects residual v1 documents", () => {
+    expect(SNAPSHOT_SCHEMA_VERSION).toBe(2);
+    expect(validateSnapshotSet(validSnapshotFiles())).toHaveLength(3);
 
+    const legacyVersion = angelFile();
+    (legacyVersion.value as { schemaVersion: number }).schemaVersion = 1;
+    expectInvalid([legacyVersion], "schema_invalid_value");
+
+    const legacyHourRow = angelFile();
+    (legacyHourRow.value as { usage: Record<string, unknown>[] }).usage[0]!["hour"] =
+      "2026-07-26T08:00:00.000Z";
+    expectInvalid([legacyHourRow], "privacy_forbidden_property");
+  });
+
+  it("rejects quota samples outside the snapshot date and quota instants with a time component", () => {
     const quotaOutside = angelFile();
-    (quotaOutside.value as typeof angelSnapshot).quotaSamples[0]!.takenAt = "2026-07-25T08:30:00.000Z";
+    (quotaOutside.value as typeof angelSnapshot).quotaSamples[0]!.takenAt = "2026-07-25";
     expectInvalid([quotaOutside], "quota_outside_snapshot_date");
+
+    const quotaWithTime = angelFile();
+    (quotaWithTime.value as typeof angelSnapshot).quotaSamples[0]!.takenAt =
+      "2026-07-26T08:30:00.000Z";
+    expectInvalid([quotaWithTime], "schema_invalid_format");
   });
 
   it("rejects duplicate aggregate keys", () => {
@@ -157,6 +173,7 @@ describe("snapshot privacy", () => {
     "raw_response",
     "sourceFilePath",
     "record_hash",
+    "hour",
   ])(
     "rejects the forbidden field %s without exposing its value",
     (field) => {

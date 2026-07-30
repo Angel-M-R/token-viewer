@@ -90,4 +90,57 @@ describe("snapshot CI policy", () => {
     const result = await execFile("git", ["-C", repositoryRoot, "diff", "--name-only", "HEAD", "HEAD"]);
     expect(result.stdout).toBe("");
   });
+
+  it("keeps automated publisher paths free of force-push commands", async () => {
+    const automatedPaths = [
+      "apps/collector/src/publisher.ts",
+      "ops/macos/com.tokenviewer.collector.plist.template",
+      "ops/macos/install-launchd.mjs",
+      "ops/macos/run-daily-publisher.mjs",
+      ".github/workflows/snapshot-validation.yml",
+    ];
+    const forcePushOption = /(?:--force(?:-with-lease|-if-includes)?|-f)(?:\s|["'])/;
+
+    for (const path of automatedPaths) {
+      const content = await readFile(resolve(repositoryRoot, path), "utf8");
+      expect(content, path).not.toMatch(forcePushOption);
+    }
+  });
+
+  it("keeps the entire tracked final tree free of prohibited identity literals", async () => {
+    const prohibitedStem = Buffer.from("YW9u", "base64").toString("utf8");
+    const prohibitedLiteral = new RegExp(
+      `(?:^|[^a-z0-9])${prohibitedStem}(?:$|[^a-z0-9])`,
+      "i",
+    );
+    const listing = await execFile("git", ["-C", repositoryRoot, "ls-files", "-z"]);
+    const trackedPaths = listing.stdout.split("\0").filter(Boolean);
+    const offenders: string[] = [];
+
+    expect(prohibitedLiteral.test(`machine/${prohibitedStem}-mac`)).toBe(true);
+    expect(prohibitedLiteral.test("dataOnly")).toBe(false);
+
+    for (const path of trackedPaths) {
+      if (prohibitedLiteral.test(path)) {
+        offenders.push(path);
+        continue;
+      }
+      const content = await readFile(resolve(repositoryRoot, path), "utf8").catch(() => "");
+      if (prohibitedLiteral.test(content)) offenders.push(path);
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  it("gates snapshots and the focused whole-tree identity policy in CI", async () => {
+    const workflow = await readFile(
+      resolve(repositoryRoot, ".github/workflows/snapshot-validation.yml"),
+      "utf8",
+    );
+
+    expect(workflow).toContain("pnpm validate:snapshots");
+    expect(workflow).toContain("pnpm validate:snapshot-fixtures");
+    expect(workflow).toContain("pnpm test:ci-snapshots");
+    expect(workflow).toContain("pnpm typecheck:ci-snapshots");
+  });
 });

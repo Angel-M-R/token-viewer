@@ -39,7 +39,7 @@ describe("local dashboard integration", () => {
     expect(screen.getByLabelText("old-mac Copilot quota gauge")).toBeInTheDocument();
     expect(screen.getByLabelText("mac-m5 Copilot quota gauge")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Daily usage chart" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Hourly heatmap" })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: "Hourly heatmap" })).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Calendar heatmap" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Models" })).toBeInTheDocument();
     expect(screen.queryByText(/dashboard token|login|individual records/i)).not.toBeInTheDocument();

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2025-12-01",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "cursor",
+      "provider": "unknown",
+      "model": "claude-4.5-opus-high-thinking",
+      "requests": 22,
+      "inputTokens": 1590485,
+      "outputTokens": 71016,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 22
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 22,
+    "inputTokens": 1590485,
+    "outputTokens": 71016,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 0,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0,
+    "billedCost": 0,
+    "unpricedRequests": 22
+  }
+}

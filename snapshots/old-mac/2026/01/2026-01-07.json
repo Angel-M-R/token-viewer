@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2026-01-07",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "opencode",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5",
+      "requests": 107,
+      "inputTokens": 628,
+      "outputTokens": 57932,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 3758045,
+      "cacheWriteTokens": 367018,
+      "estimatedCost": 1.124865,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "anthropic",
+      "model": "claude-opus-4-5",
+      "requests": 12,
+      "inputTokens": 6,
+      "outputTokens": 5515,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 647197,
+      "cacheWriteTokens": 176868,
+      "estimatedCost": 1.5669285,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.2-chat-latest",
+      "requests": 17,
+      "inputTokens": 39516,
+      "outputTokens": 16696,
+      "reasoningTokens": 10739,
+      "cacheReadTokens": 286080,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.5033070000000001,
+      "billedCost": 0.5033070000000001,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "opencode",
+      "model": "glm-4.7-free",
+      "requests": 26,
+      "inputTokens": 567387,
+      "outputTokens": 11606,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 465229,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 162,
+    "inputTokens": 607537,
+    "outputTokens": 91749,
+    "reasoningTokens": 10739,
+    "cacheReadTokens": 5156551,
+    "cacheWriteTokens": 543886,
+    "estimatedCost": 3.1951005,
+    "billedCost": 0.5033070000000001,
+    "unpricedRequests": 0
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-03-24",
+  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 13,
+      "inputTokens": 207060,
+      "outputTokens": 995,
+      "reasoningTokens": 807,
+      "cacheReadTokens": 177280,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.589,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "requests": 910,
+      "inputTokens": 7566196,
+      "outputTokens": 538391,
+      "reasoningTokens": 137480,
+      "cacheReadTokens": 51762944,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 41.994291,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 923,
+    "inputTokens": 7773256,
+    "outputTokens": 539386,
+    "reasoningTokens": 138287,
+    "cacheReadTokens": 51940224,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 42.583290999999996,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

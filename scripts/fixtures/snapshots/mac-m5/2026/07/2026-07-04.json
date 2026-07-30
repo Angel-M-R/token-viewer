@@ -1,11 +1,10 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "machine": "mac-m5",
   "date": "2026-07-04",
   "generatedAt": "2026-07-05T00:15:00.000Z",
   "usage": [
     {
-      "hour": "2026-07-04T11:00:00.000Z",
       "agent": "opencode",
       "provider": "openai",
       "model": "gpt-5",
@@ -23,7 +22,7 @@
   "quotaSamples": [
     {
       "provider": "copilot",
-      "takenAt": "2026-07-04T13:00:00.000Z",
+      "takenAt": "2026-07-04",
       "percentUsed": 42,
       "plan": "Pro",
       "resetsAt": "2026-08-01T00:00:00.000Z"

@@ -160,7 +160,6 @@ describe("one-time SQLite snapshot migration", () => {
     await writeDailySnapshotAtomic(fixture.repositoryRoot, {
       ...emptySnapshot("angel-mac", "2025-09-12"),
       usage: [{
-        hour: "2025-09-12T10:00:00.000Z",
         agent: "codex",
         provider: "openai",
         model: "gpt-test",
@@ -222,7 +221,7 @@ describe("one-time SQLite snapshot migration", () => {
       ...emptySnapshot("angel-mac", "2025-09-11"),
       quotaSamples: [{
         provider: "copilot",
-        takenAt: "2025-09-11T12:00:00.000Z",
+        takenAt: "2025-09-11",
         percentUsed: 41,
         plan: "individual",
         resetsAt: "2025-10-01T00:00:00.000Z",
@@ -338,7 +337,7 @@ function addQuota(databasePath: string, machine: "angel-mac" | "old-mac", date: 
 
 function emptySnapshot(machine: "angel-mac" | "old-mac", date: string) {
   return {
-    schemaVersion: 1 as const,
+    schemaVersion: 2 as const,
     machine,
     date,
     generatedAt: "2026-07-27T10:00:00.000Z",

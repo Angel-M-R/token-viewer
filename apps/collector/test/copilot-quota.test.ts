@@ -17,7 +17,7 @@ describe("Copilot quota collection", () => {
 
     expect(sample).toEqual({
       provider: "copilot",
-      takenAt: "2026-07-05T10:00:00.000Z",
+      takenAt: "2026-07-05",
       percentUsed: 67,
       plan: "Pro",
       resetsAt: "2026-08-01T00:00:00.000Z",
@@ -32,7 +32,7 @@ describe("Copilot quota collection", () => {
 
     expect(sample).toEqual({
       provider: "copilot",
-      takenAt: "2026-07-05T10:00:00.000Z",
+      takenAt: "2026-07-05",
       percentUsed: 12,
     });
   });
@@ -43,7 +43,7 @@ describe("Copilot quota collection", () => {
       fetcher: async () => Response.json({ future_account_id: "private", future_payload: { raw: true } }),
     });
 
-    expect(sample).toEqual({ provider: "copilot", takenAt: "2026-07-05T10:00:00.000Z" });
+    expect(sample).toEqual({ provider: "copilot", takenAt: "2026-07-05" });
     expect(JSON.stringify(sample)).not.toMatch(/account|payload|private|raw/);
   });
 

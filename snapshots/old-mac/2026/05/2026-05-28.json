@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "machine": "old-mac",
+  "date": "2026-05-28",
+  "generatedAt": "2026-07-27T00:37:29.131Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 73,
+      "inputTokens": 477252,
+      "outputTokens": 11654,
+      "reasoningTokens": 7503,
+      "cacheReadTokens": 4687232,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 5.304586,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "google",
+      "model": "gemini-3.5-flash",
+      "requests": 236,
+      "inputTokens": 2626173,
+      "outputTokens": 41891,
+      "reasoningTokens": 57441,
+      "cacheReadTokens": 19634710,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 7.778454,
+      "billedCost": 7.778454,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "requests": 371,
+      "inputTokens": 2564896,
+      "outputTokens": 89709,
+      "reasoningTokens": 20443,
+      "cacheReadTokens": 24214016,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 34.053228,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.5-fast",
+      "requests": 243,
+      "inputTokens": 959352,
+      "outputTokens": 45090,
+      "reasoningTokens": 19843,
+      "cacheReadTokens": 12919296,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 243
+    },
+    {
+      "agent": "pi",
+      "provider": "openai-codex",
+      "model": "gpt-5.5",
+      "requests": 211,
+      "inputTokens": 797116,
+      "outputTokens": 33183,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 11673600,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 10.81787,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 1134,
+    "inputTokens": 7424789,
+    "outputTokens": 221527,
+    "reasoningTokens": 105230,
+    "cacheReadTokens": 73128854,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 57.954138,
+    "billedCost": 7.778454,
+    "unpricedRequests": 243
+  }
+}

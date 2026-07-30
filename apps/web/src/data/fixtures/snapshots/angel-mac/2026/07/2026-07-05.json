@@ -1,11 +1,10 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2026-07-05",
   "generatedAt": "2026-07-06T00:05:00.000Z",
   "usage": [
     {
-      "hour": "2026-07-05T01:00:00.000Z",
       "agent": "codex",
       "provider": "openai",
       "model": "gpt-5",
@@ -23,7 +22,7 @@
   "quotaSamples": [
     {
       "provider": "copilot",
-      "takenAt": "2026-07-05T12:00:00.000Z",
+      "takenAt": "2026-07-05",
       "percentUsed": 60,
       "plan": "Pro",
       "resetsAt": "2026-08-01T00:00:00.000Z"

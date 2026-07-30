@@ -5,13 +5,12 @@ import {
 } from "../../src/index.js";
 
 export const angelSnapshot: DailySnapshot = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   machine: "angel-mac",
   date: "2026-07-26",
   generatedAt: "2026-07-27T00:05:00.000Z",
   usage: [
     {
-      hour: "2026-07-26T08:00:00.000Z",
       agent: "claude",
       provider: "anthropic",
       model: "claude-sonnet-4",
@@ -26,7 +25,6 @@ export const angelSnapshot: DailySnapshot = {
       unpricedRequests: 0,
     },
     {
-      hour: "2026-07-26T09:00:00.000Z",
       agent: "codex",
       provider: "openai",
       model: "gpt-5",
@@ -44,15 +42,15 @@ export const angelSnapshot: DailySnapshot = {
   quotaSamples: [
     {
       provider: "copilot",
-      takenAt: "2026-07-26T08:30:00.000Z",
-      percentUsed: 25,
+      takenAt: "2026-07-26",
+      percentUsed: 30,
       plan: "Pro",
       resetsAt: "2026-08-01T00:00:00.000Z",
     },
     {
-      provider: "copilot",
-      takenAt: "2026-07-26T09:30:00.000Z",
-      percentUsed: 30,
+      provider: "cursor",
+      takenAt: "2026-07-26",
+      percentUsed: 12,
       plan: "Pro",
       resetsAt: "2026-08-01T00:00:00.000Z",
     },
@@ -70,14 +68,13 @@ export const angelSnapshot: DailySnapshot = {
   },
 };
 
-export const aonSnapshot: DailySnapshot = {
-  schemaVersion: 1,
+export const oldMacSnapshot: DailySnapshot = {
+  schemaVersion: 2,
   machine: "old-mac",
   date: "2026-07-26",
   generatedAt: "2026-07-27T00:06:00.000Z",
   usage: [
     {
-      hour: "2026-07-26T10:00:00.000Z",
       agent: "cursor",
       provider: UNKNOWN_DIMENSION,
       model: UNKNOWN_DIMENSION,
@@ -106,14 +103,13 @@ export const aonSnapshot: DailySnapshot = {
   },
 };
 
-export const aonM5Snapshot: DailySnapshot = {
-  schemaVersion: 1,
+export const macM5Snapshot: DailySnapshot = {
+  schemaVersion: 2,
   machine: "mac-m5",
   date: "2026-07-26",
   generatedAt: "2026-07-27T00:07:00.000Z",
   usage: [
     {
-      hour: "2026-07-26T11:00:00.000Z",
       agent: "codex",
       provider: "openai",
       model: "gpt-5",
@@ -150,11 +146,11 @@ export function validSnapshotFiles(): SnapshotSourceFile[] {
     },
     {
       path: "snapshots/old-mac/2026/07/2026-07-26.json",
-      value: structuredClone(aonSnapshot),
+      value: structuredClone(oldMacSnapshot),
     },
     {
       path: "snapshots/mac-m5/2026/07/2026-07-26.json",
-      value: structuredClone(aonM5Snapshot),
+      value: structuredClone(macM5Snapshot),
     },
   ];
 }

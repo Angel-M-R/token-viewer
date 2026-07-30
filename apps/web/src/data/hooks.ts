@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getLocalSnapshotRepository,
   type DailyGroupBy,
-  type HeatmapMetric,
   type LocalFilters,
   type LocalSnapshotRepository,
 } from "./repository";
@@ -14,20 +13,6 @@ export function useSummary(filters: LocalFilters, enabled = true) {
 
 export function useDaily(filters: LocalFilters, groupBy: DailyGroupBy, enabled = true) {
   return useLocalQuery(`daily:${groupBy}`, filters, (repository) => repository.queryDaily(filters, groupBy), enabled);
-}
-
-export function useHeatmap(
-  filters: LocalFilters,
-  metric: HeatmapMetric,
-  timeZone: string,
-  enabled = true,
-) {
-  return useLocalQuery(
-    `heatmap:${metric}:${timeZone}`,
-    filters,
-    (repository) => repository.queryHourlyHeatmap(filters, metric, timeZone),
-    enabled,
-  );
 }
 
 export function useModels(filters: LocalFilters, enabled = true) {

@@ -3,30 +3,8 @@ name: Snapshot and monorepo validation
 on:
   push:
     branches: [master]
-    paths:
-      - ".github/workflows/snapshot-validation.yml"
-      - "apps/**"
-      - "ops/**"
-      - "package.json"
-      - "packages/**"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "scripts/**"
-      - "snapshots/**"
-      - "tsconfig*.json"
   pull_request:
     branches: [master]
-    paths:
-      - ".github/workflows/snapshot-validation.yml"
-      - "apps/**"
-      - "ops/**"
-      - "package.json"
-      - "packages/**"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - "scripts/**"
-      - "snapshots/**"
-      - "tsconfig*.json"
 
 permissions:
   contents: read
@@ -68,10 +46,15 @@ jobs:
       - name: Reject mixed-machine data publications
         run: pnpm ci:check-snapshot-publication -- "$CI_BASE_SHA" "$CI_HEAD_SHA"
 
-      - name: Validate all snapshots and privacy invariants
+      - name: Check the complete tracked tree for prohibited identity literals
+        run: pnpm test:ci-snapshots && pnpm typecheck:ci-snapshots
+
+      # The literal check proves the identity scrub. Schema v2 remains the privacy
+      # safeguard for snapshot payloads and does not rely on text matching.
+      - name: Validate all snapshots against schema v2 and privacy invariants
         run: pnpm validate:snapshots
 
-      - name: Validate sanitized two-machine fixtures
+      - name: Validate sanitized schema v2 three-machine fixtures
         run: pnpm validate:snapshot-fixtures
 
       - name: Check snapshot size and validation runtime budget
