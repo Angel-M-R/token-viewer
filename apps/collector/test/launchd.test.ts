@@ -174,7 +174,7 @@ describe.sequential("launchd installer", () => {
     expect((await readFile(commandLog, "utf8")).trim().split("\n")).toEqual([
       `git:-C ${canonicalCheckout} pull --rebase origin master`,
       `pnpm:--dir ${canonicalCheckout} --filter collector... build`,
-      `pnpm:--dir ${canonicalCheckout} --filter collector publish`,
+      `pnpm:--dir ${canonicalCheckout} --filter collector run publish`,
     ]);
   });
 });

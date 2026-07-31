@@ -10,7 +10,7 @@ try {
   const checkout = await parseCheckout(process.argv.slice(2));
   await run("git", ["-C", checkout, "pull", "--rebase", "origin", "master"]);
   await run("pnpm", ["--dir", checkout, "--filter", "collector...", "build"]);
-  await run("pnpm", ["--dir", checkout, "--filter", "collector", "publish"]);
+  await run("pnpm", ["--dir", checkout, "--filter", "collector", "run", "publish"]);
 } catch (error) {
   process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
   process.exitCode = 1;

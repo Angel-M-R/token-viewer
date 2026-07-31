@@ -54,7 +54,7 @@ tail -n 200 "$HOME/Library/Logs/TokenViewer/angel-mac.err.log"
 Run the same publisher command directly when interactive output is desired, or ask `launchd` to start the installed job immediately:
 
 ```sh
-pnpm --dir "$CHECKOUT" --filter collector publish
+pnpm --dir "$CHECKOUT" --filter collector run publish
 launchctl kickstart -k "gui/$(id -u)/$LABEL"
 ```
 
@@ -128,7 +128,7 @@ tail -n 200 "$HOME/Library/Logs/TokenViewer/mac-m5.err.log"
 ### Manual run
 
 ```sh
-pnpm --dir "$CHECKOUT" --filter collector publish
+pnpm --dir "$CHECKOUT" --filter collector run publish
 launchctl kickstart -k "gui/$(id -u)/$LABEL"
 ```
 

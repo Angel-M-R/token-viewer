@@ -22,7 +22,9 @@ describe("complete historical backfill dashboard validation", () => {
     );
 
     // 313 migrated schema v2 daily snapshots plus the representative `mac-m5` fixture.
-    expect(files).toHaveLength(314);
+    expect(files).toHaveLength(
+      Object.keys(completeBackfillModules).length + Object.keys(representativeM5Modules).length,
+    );
     expect(new Set(files.map((file) => file.machine))).toEqual(
       new Set(["angel-mac", "old-mac", "mac-m5"]),
     );
