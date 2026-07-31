@@ -175,7 +175,6 @@ export async function runCollector(
 
   if (!options.dryRun) {
     await saveCollectorState({
-      schemaVersion: 1,
       files: newFiles,
       lastRunAt: summary.generatedAt,
       pendingPublicationCommit: options.publish ? undefined : stateResult.state.pendingPublicationCommit,

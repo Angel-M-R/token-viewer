@@ -4,15 +4,15 @@
 TBD - created by archiving change fase-3-dashboard-web. Update Purpose after archive.
 ## Requirements
 ### Requirement: Barras apiladas por día
-La vista principal SHALL renderizar una gráfica de barras apiladas por día alimentada por `GET /api/v1/stats/daily` con los filtros globales aplicados, donde cada segmento de la pila corresponde a un valor del `groupBy` activo.
+La vista principal SHALL renderizar una gráfica de barras apiladas por día alimentada por la consulta local de snapshots v2 con los filtros aplicados, donde cada segmento corresponde al `groupBy` activo.
 
 #### Scenario: Renderizado de la serie diaria
-- **WHEN** el usuario selecciona un rango de 30 días con datos de varios agentes
-- **THEN** la gráfica muestra una barra por día, apilada por agente, cubriendo el rango seleccionado
+- **WHEN** el rango contiene datos de varios agentes
+- **THEN** la gráfica muestra una barra por día apilada por agente
 
 #### Scenario: Tooltip por día
 - **WHEN** el usuario pasa el cursor sobre una barra
-- **THEN** un tooltip muestra la fecha y el valor de cada segmento de la pila con su total
+- **THEN** el tooltip muestra fecha, segmentos y total
 
 ### Requirement: groupBy conmutable
 La gráfica diaria SHALL permitir conmutar la dimensión de apilado (`groupBy`) entre agente, modelo y máquina sin perder el resto de filtros.
@@ -29,13 +29,12 @@ La gráfica diaria SHALL ofrecer un toggle para alternar la magnitud representad
 - **THEN** las barras y su eje representan USD con 2 decimales en lugar de tokens
 
 ### Requirement: Media móvil de 7 días
-La gráfica diaria SHALL superponer una línea de media móvil de 7 días de la magnitud activa, calculada en el cliente a partir de la serie diaria ya agregada por el servidor.
+La gráfica SHALL superponer una media móvil de 7 días calculada en el cliente desde la serie diaria local.
 
 #### Scenario: Línea de media móvil
-- **WHEN** la gráfica muestra al menos 7 días de datos
-- **THEN** una línea de media móvil de 7 días se dibuja superpuesta a las barras y se actualiza al cambiar el toggle tokens/coste
+- **WHEN** la gráfica muestra al menos siete días
+- **THEN** la línea se calcula y actualiza con la magnitud activa
 
 #### Scenario: Rango menor de 7 días
-- **WHEN** el rango seleccionado tiene menos de 7 días
-- **THEN** la media móvil se calcula con la ventana disponible en cada punto sin producir huecos ni errores
-
+- **WHEN** el rango contiene menos de siete días
+- **THEN** usa la ventana disponible sin huecos ni errores

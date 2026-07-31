@@ -1,51 +1,31 @@
-# Spec 03 — Dashboard web (`apps/web`)
+# Spec 03 — Dashboard local (`apps/web`)
 
 ## Objetivo
 
-SPA React (Vite + TypeScript) servida como estáticos por el servidor. Librería de charts: **Apache ECharts** (via `echarts-for-react` o wrapper propio ligero) — elegida porque trae de serie heatmap cartesiano (hora × día), calendar heatmap estilo GitHub, series temporales apiladas, tooltips y modo oscuro, todo canvas y sin dependencias extra.
+SPA React/Vite ejecutada exclusivamente en local. Descubre los snapshots versionados mediante imports estáticos, valida el conjunto completo y ejecuta todas las consultas en memoria. No usa autenticación, procesos auxiliares, proxy, hosting público ni rutas de datos individuales.
 
-## Layout
+## Filtros globales
 
-Barra superior con **filtros globales** que afectan a toda la página:
-- Rango de fechas (presets: 7d, 30d, 90d, año, todo; y rango custom)
-- Máquina(s), agente(s), modelo(s) — multiselect poblados desde la API
-- Métrica activa para el heatmap: tokens | coste | requests
+- Rango de fechas local con presets y rango custom.
+- Multiselect de máquina, agente, proveedor y modelo derivado de los snapshots cargados.
+- Selector de métrica para el calendar heatmap diario.
+- Estado persistido en query params sin hora ni zona horaria.
 
-## Vistas v1
+Las tres identidades aparecen en el dashboard, incluida `old-mac` como histórico consultable.
 
-### 1. Resumen (cards)
-Total de tokens (desglosado input/output/cache en tooltip), coste estimado USD, nº de requests, nº de máquinas activas, y delta vs periodo anterior equivalente.
+## Vistas
 
-### 2. Coste y tokens por día
-- Gráfica principal de barras apiladas por día (`stats/daily`), con `groupBy` conmutable: por agente, por modelo o por máquina.
-- Toggle tokens ↔ coste.
-- Línea de media móvil de 7 días superpuesta.
+1. Resumen de requests, cinco categorías de tokens, costes, solicitudes sin precio y modelos.
+2. Serie diaria agrupable por agente, modelo o máquina.
+3. Calendar heatmap anual sobre totales diarios.
+4. Desglose por proveedor y modelo.
+5. Cuotas sanitizadas por máquina y proveedor.
 
-### 3. Heatmap horario
-- Matriz 7 (día de semana) × 24 (hora local del navegador) con intensidad por la métrica activa (`stats/heatmap?tz=<navegador>`).
-- Escala de color secuencial con leyenda; celda con tooltip (día, hora, valor, nº requests).
-- Extra barato con ECharts: **calendar heatmap** anual estilo GitHub debajo, con intensidad diaria.
-
-### 4. Modelos
-Tabla ordenable por modelo (`stats/models`): tokens por tipo, coste, requests, % del total, con badge de proveedor coloreado (reusar la idea de mapeo proveedor→color del informe HTML de devrage).
-
-## Detalles de implementación
-
-- Data-fetching con TanStack Query (caché por combinación de filtros, refetch al volver el foco + polling cada 60 s).
-- Estado de filtros en la URL (query params) para poder compartir/bookmarkear vistas.
-- Tema claro/oscuro siguiendo `prefers-color-scheme`; ECharts registrado con ambos temas.
-- Si el servidor define `DASHBOARD_TOKEN`: pantalla simple de token que lo guarda en localStorage y lo añade como Bearer.
-- Formateo: tokens abreviados (1.2M), coste con 2 decimales USD, fechas en locale del navegador.
-
-## Backlog (fase 4, fuera de v1)
-
-- Comparativa entre máquinas (ranking + series superpuestas).
-- Desglose por proyecto/sesión con drill-down a `records`.
-- Vista de cuota de Copilot (spec 04).
-- Export CSV de cualquier vista.
+No existe heatmap 7×24, conversión horaria, drill-down individual ni lista de registros.
 
 ## Criterios de aceptación
 
-- Con 6 meses de datos, cambiar un filtro re-renderiza en < 1 s (agregación en servidor, no en cliente).
-- El heatmap muestra horas en la zona horaria del navegador (una sesión a las 23:00 de Madrid no aparece a las 21:00).
-- Usable en una ventana de 1280px y en móvil (charts con `resize` observer).
+- Un checkout con snapshots v2 válidos carga todas las vistas sin llamadas de red.
+- `angel-mac`, `old-mac` y `mac-m5` son filtrables.
+- Un snapshot inválido produce un error explícito sin entregar datos parciales.
+- Ninguna vista expone login, prompts, sesiones, proyectos, rutas, hashes o solicitudes individuales.

@@ -17,4 +17,4 @@ tokenviewer-collector copilot status
 tokenviewer-collector copilot logout
 ```
 
-During `tokenviewer-collector run`, Copilot quota collection is best-effort. If no Copilot token is configured, the step is skipped. If GitHub or the TokenViewer server rejects the quota request, log ingestion continues and the run reports a warning.
+During `tokenviewer-collector run`, Copilot quota collection is best-effort. If no Copilot token is configured, the step is skipped. If GitHub rejects the quota request or the network is unavailable, local snapshot generation continues and the run reports a warning. Only the sanitized daily quota fields can be written to a snapshot.

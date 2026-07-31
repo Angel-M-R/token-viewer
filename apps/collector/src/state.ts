@@ -4,7 +4,6 @@ import { collectorStatePath, type FileCursorMap } from "@tokenviewer/core";
 import { z } from "zod";
 
 export interface CollectorState {
-  schemaVersion: 1;
   files: FileCursorMap;
   lastRunAt?: string;
   pendingPublicationCommit?: string;
@@ -20,14 +19,13 @@ const fileCursorSchema = z.object({
   size: z.number().int().nonnegative(),
   mtimeMs: z.number().nonnegative(),
   lastByteOffset: z.number().int().nonnegative().optional(),
-});
+}).strict();
 
 const collectorStateSchema = z.object({
-  schemaVersion: z.literal(1),
   files: z.record(z.string(), fileCursorSchema),
   lastRunAt: z.string().datetime({ offset: true }).optional(),
   pendingPublicationCommit: z.string().min(1).optional(),
-});
+}).strict();
 
 export async function loadCollectorState(): Promise<LoadStateResult> {
   const path = collectorStatePath();
@@ -64,7 +62,6 @@ export async function saveCollectorState(state: CollectorState): Promise<void> {
 
 export function emptyState(): CollectorState {
   return {
-    schemaVersion: 1,
     files: {},
   };
 }

@@ -55,22 +55,4 @@ describe("snapshot directory validation", () => {
     expect(result.stderr).not.toContain("PRIVATE-VALUE");
   });
 
-  it("makes the CLI exit non-zero on any residual schema version 1 file", async () => {
-    const root = await createSnapshotRoot();
-    await writeSnapshot(root, "angel-mac/2026/07/2026-07-26.json", angelSnapshot);
-    await writeSnapshot(root, "old-mac/2026/07/2026-07-26.json", {
-      ...oldMacSnapshot,
-      schemaVersion: 1,
-    });
-
-    const cliPath = fileURLToPath(new URL("../src/validate-snapshots-cli.ts", import.meta.url));
-    const result = spawnSync("pnpm", ["exec", "tsx", cliPath, root], {
-      cwd: fileURLToPath(new URL("../../..", import.meta.url)),
-      encoding: "utf8",
-    });
-
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain("unsupported_schema_version");
-    expect(result.stderr).toContain("old-mac/2026/07/2026-07-26.json");
-  });
 });

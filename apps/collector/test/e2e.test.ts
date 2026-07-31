@@ -74,11 +74,41 @@ describe.sequential("collector local snapshots", () => {
     expect(JSON.stringify(snapshot)).not.toMatch(/octocat|unknown|gho_secret|raw|login/);
   });
 
+  it.sequential("rejects versioned state and completely rescans without converting or deleting it", async () => {
+    const root = await collectorRoot("tv-versioned-state-");
+    const sourceFile = await writeClaudeRecord(root);
+    const sourceStat = await stat(sourceFile);
+    const path = collectorStatePath();
+    await import("node:fs/promises").then(({ mkdir }) =>
+      mkdir(path.slice(0, path.lastIndexOf("/")), { recursive: true }),
+    );
+    const versionedState = `${JSON.stringify({
+      schemaVersion: 1,
+      files: {
+        [sourceFile]: {
+          size: sourceStat.size,
+          mtimeMs: sourceStat.mtimeMs,
+          lastByteOffset: sourceStat.size,
+        },
+      },
+      lastRunAt: "2026-07-05T11:00:00.000Z",
+    })}\n`;
+    await writeFile(path, versionedState, "utf8");
+
+    const summary = await runCollector(
+      { dryRun: true, agents: ["claude"] },
+      { pricing: PRICING, now: () => NOW },
+    );
+
+    expect(summary.warnings).toEqual([expect.stringContaining("version desconocida")]);
+    expect(summary.totals).toMatchObject({ requests: 1, inputTokens: 3, outputTokens: 4 });
+    await expect(readFile(path, "utf8")).resolves.toBe(versionedState);
+  });
+
   it.sequential("reports identity, source and snapshot coverage, missing days, last run, and pending commit", async () => {
     const root = await collectorRoot("tv-status-");
     await writeClaudeRecord(root);
     await saveCollectorState({
-      schemaVersion: 1,
       files: {},
       lastRunAt: "2026-07-06T00:00:00.000Z",
       pendingPublicationCommit: "abc1234",

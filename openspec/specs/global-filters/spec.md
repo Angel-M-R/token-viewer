@@ -4,53 +4,36 @@
 TBD - created by archiving change fase-3-dashboard-web. Update Purpose after archive.
 ## Requirements
 ### Requirement: Barra de filtros globales
-El dashboard SHALL mostrar una barra superior de filtros globales que afectan a todas las vistas de la página: rango de fechas, máquina(s), agente(s), modelo(s) y métrica activa para el heatmap.
+El dashboard SHALL mostrar rango de fechas, máquinas, agentes, proveedores, modelos y métrica del calendar heatmap. La barra MUST NOT ofrecer controles de granularidad horaria.
 
 #### Scenario: Un filtro afecta a todas las vistas
-- **WHEN** el usuario selecciona un agente en el multiselect de agentes
-- **THEN** las cards de resumen, la gráfica diaria, el heatmap y la tabla de modelos se recargan mostrando solo datos de ese agente
+- **WHEN** el usuario selecciona un agente
+- **THEN** todas las vistas se recalculan sobre ese filtro
 
 ### Requirement: Rango de fechas con presets y rango custom
-El filtro de fechas SHALL ofrecer los presets 7d, 30d, 90d, año y todo, además de un selector de rango custom con fechas de inicio y fin explícitas.
-
-#### Scenario: Selección de preset
-- **WHEN** el usuario selecciona el preset "30d"
-- **THEN** todas las vistas consultan la API con `from`/`to` cubriendo los últimos 30 días
+El filtro SHALL ofrecer 7d, 30d, 90d, año, todo y rango custom. Los límites MUST interpretarse como fechas sin componente horario coherentes con los snapshots diarios.
 
 #### Scenario: Rango custom
-- **WHEN** el usuario define un rango custom con fechas de inicio y fin
-- **THEN** todas las vistas consultan la API con exactamente ese `from`/`to`
+- **WHEN** el usuario define inicio y fin
+- **THEN** todas las vistas usan exactamente ese rango inclusivo
 
 ### Requirement: Multiselects poblados desde la API
-Los filtros de máquina, agente y modelo MUST ser multiselect y sus opciones MUST poblarse dinámicamente desde la API (máquinas desde `GET /api/v1/machines`; agentes y modelos desde los datos agregados), no desde listas hardcodeadas.
+Los filtros de máquina, agente, proveedor y modelo MUST ser multiselect y sus opciones MUST derivarse dinámicamente de los snapshots v2 cargados, no de listas hardcodeadas ni de una API. `old-mac` MUST permanecer seleccionable como histórico.
 
-#### Scenario: Aparece una máquina nueva
-- **WHEN** una máquina nueva registra datos en el servidor y el usuario abre el dashboard
-- **THEN** la máquina aparece como opción seleccionable en el multiselect de máquinas sin cambios de código
-
-#### Scenario: Selección múltiple
-- **WHEN** el usuario selecciona dos modelos en el multiselect de modelos
-- **THEN** las peticiones a `stats/*` incluyen ambos valores como parámetros `model` repetidos y las vistas agregan solo esos modelos
+#### Scenario: Opciones locales
+- **WHEN** el dashboard carga el conjunto válido
+- **THEN** las opciones reflejan sus dimensiones e identidades
 
 ### Requirement: Métrica activa del heatmap
-La barra de filtros SHALL incluir un selector de métrica activa para el heatmap con los valores tokens, coste y requests.
+La barra SHALL incluir tokens, coste y requests como métricas del calendar heatmap diario. El selector MUST NOT controlar una vista horaria.
 
 #### Scenario: Cambio de métrica
-- **WHEN** el usuario cambia la métrica activa de tokens a coste
-- **THEN** el heatmap se recarga con `metric=cost` y su leyenda y tooltips reflejan valores en USD
+- **WHEN** el usuario cambia a coste
+- **THEN** el calendar heatmap recalcula intensidad, leyenda y tooltips en USD
 
 ### Requirement: Filtros persistidos en los query params de la URL
-El estado completo de los filtros globales MUST serializarse en los query params de la URL, de modo que la URL sea la única fuente de verdad: compartir o bookmarkear la URL MUST reproducir exactamente la misma vista.
-
-#### Scenario: Cambio de filtro actualiza la URL
-- **WHEN** el usuario cambia cualquier filtro global
-- **THEN** los query params de la URL se actualizan sin recargar la página
+El estado completo de filtros MUST serializarse en query params para reproducir la misma vista. Los parámetros MUST representar únicamente filtros soportados por el dashboard diario.
 
 #### Scenario: Apertura de una URL con filtros
-- **WHEN** un usuario abre una URL del dashboard que contiene filtros en los query params
-- **THEN** la barra de filtros y todas las vistas se inicializan con exactamente esos filtros
-
-#### Scenario: Navegación atrás del navegador
-- **WHEN** el usuario pulsa el botón atrás del navegador tras cambiar filtros
-- **THEN** los filtros y las vistas vuelven al estado codificado en la URL anterior
-
+- **WHEN** se abre una URL con filtros válidos
+- **THEN** la barra y las vistas se inicializan con esos valores

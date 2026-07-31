@@ -23,15 +23,15 @@ El colector SHALL exponer el comando `tokenviewer-collector copilot login`, que 
 - **THEN** el colector termina con un error claro que indica repetir `copilot login`
 
 ### Requirement: Almacenamiento del token con permisos 0600
-El colector SHALL guardar el token OAuth de GitHub en su fichero de configuración local y MUST dejar ese fichero con permisos `0600` tras escribirlo. El token MUST NOT enviarse nunca al servidor de TokenViewer.
+El collector SHALL guardar el token OAuth de GitHub en su configuración local y MUST dejar el fichero con permisos `0600`. El token MUST usarse únicamente para las operaciones locales autorizadas contra GitHub y Copilot y MUST NOT incorporarse a snapshots, commits, logs ni configuración de publicación.
 
 #### Scenario: Permisos tras el login
-- **WHEN** el login termina con éxito y el token se escribe en el config
-- **THEN** el fichero de configuración queda con permisos `0600` (lectura/escritura solo para el propietario)
+- **WHEN** el login termina y el token se escribe
+- **THEN** el fichero queda limitado a lectura y escritura del propietario
 
-#### Scenario: El token no viaja al servidor
-- **WHEN** el colector envía cualquier petición al servidor de TokenViewer (ingesta de registros o de snapshots)
-- **THEN** el cuerpo y las cabeceras contienen solo el `machineToken` y los datos de uso/cuota, nunca el token OAuth de GitHub
+#### Scenario: El token no se publica
+- **WHEN** el collector genera y publica un snapshot
+- **THEN** el snapshot, commit y configuración operativa no contienen el token OAuth
 
 ### Requirement: Estado y cierre de sesión de Copilot
 El colector SHALL permitir consultar si hay sesión de Copilot configurada y SHALL permitir eliminar el token almacenado (logout), dejando el resto de la configuración intacta.
@@ -43,4 +43,3 @@ El colector SHALL permitir consultar si hay sesión de Copilot configurada y SHA
 #### Scenario: Logout
 - **WHEN** el usuario ejecuta el cierre de sesión de Copilot (p. ej. `tokenviewer-collector copilot logout`)
 - **THEN** el token se elimina del config, el resto de la configuración se conserva y los siguientes `run` omiten el paso de Copilot
-

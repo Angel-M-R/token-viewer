@@ -16,7 +16,7 @@ Cada adaptador SHALL implementar la interfaz `Adapter` de `packages/core`: `name
 - **THEN** `detect()` resuelve `false` y `usage()` termina sin producir registros ni lanzar error
 
 ### Requirement: Cobertura de agentes de la fase 1
-El paquete `packages/adapters` SHALL incluir exactamente los 7 adaptadores con datos de tokens portados de `references/devrage/src/adapters/`: `claude`, `codex`, `cursor`, `opencode`, `amp`, `pi` y `t3code`. Los adaptadores `cline` y `zed` MUST quedar excluidos de v1 porque sus fuentes solo exponen mensajes, no tokens. El registro de adaptadores SHALL exponer `createAdapter(name)` y `allAdapters()`.
+El paquete `packages/adapters` SHALL incluir exactamente los 7 adaptadores con datos de tokens portados de `references/devrage/src/adapters/`: `claude`, `codex`, `cursor`, `opencode`, `amp`, `pi` y `t3code`. Los adaptadores `cline` y `zed` MUST quedar excluidos porque sus fuentes solo exponen mensajes, no tokens. El registro de adaptadores SHALL exponer `createAdapter(name)` y `allAdapters()`.
 
 #### Scenario: Registro completo
 - **WHEN** se invoca `allAdapters()`
@@ -27,15 +27,15 @@ El paquete `packages/adapters` SHALL incluir exactamente los 7 adaptadores con d
 - **THEN** se lanza un error que enumera los adaptadores disponibles
 
 ### Requirement: Normalización a UsageRecord
-Cada adaptador SHALL normalizar cada request/entrada de uso a un `UsageRecord` con: `agent`, `provider?`, `model?`, `timestamp?` (ISO 8601), `session?`, `billedCost?`, `inputTokens`, `outputTokens`, `reasoningTokens`, `cacheReadTokens`, `cacheWriteTokens`, más los campos nuevos `sourceFile` (ruta absoluta del log de origen) y `recordHash` (hash estable para dedup en servidor). El campo `project` SHALL rellenarse cuando la ruta del log codifique el proyecto (Claude Code lo codifica en el directorio bajo `~/.claude/projects/`). Los contadores de tokens ausentes en el log MUST normalizarse a `0`.
+Cada adaptador SHALL normalizar cada request o entrada de uso a un `UsageRecord` con dimensiones, timestamp, contadores de tokens, coste facturado cuando exista y metadatos locales necesarios para deduplicar y agregar durante la ejecución. Los campos privados como sesión, proyecto, ruta de origen y hash MUST permanecer efímeros y MUST NOT serializarse en snapshots.
 
 #### Scenario: Registro completo desde JSONL de Claude
-- **WHEN** el adaptador claude parsea una línea `type:"assistant"` con `message.usage` en `~/.claude/projects/<proyecto>/<sesion>.jsonl`
-- **THEN** emite un `UsageRecord` con tokens, `model`, `timestamp`, `sourceFile` igual a la ruta absoluta del `.jsonl`, `recordHash` no vacío y `project` derivado del directorio
+- **WHEN** el adaptador claude parsea una entrada válida con usage
+- **THEN** emite un `UsageRecord` suficiente para deduplicación, pricing y agregación local
 
-#### Scenario: Hash estable entre ejecuciones
-- **WHEN** el mismo registro de log se parsea en dos ejecuciones distintas
-- **THEN** ambos `UsageRecord` tienen el mismo `recordHash`
+#### Scenario: Campos privados no publicados
+- **WHEN** el collector agrega registros normalizados
+- **THEN** ningún metadato privado del registro aparece en el snapshot resultante
 
 ### Requirement: Fuentes y formatos por agente
 Cada adaptador SHALL leer las fuentes locales definidas en `specs/01-collector.md`: claude desde `~/.claude/projects/**/*.jsonl` (respetando `$CLAUDE_CONFIG_DIR`) con dedup por `message.id + requestId` tomando el último valor del usage acumulativo de streaming; codex desde `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl` (respetando `$CODEX_HOME` e incluyendo `archived_sessions`) usando eventos `token_count` y el modelo de `turn_context`; cursor desde `state.vscdb` (Application Support en macOS, XDG en Linux) combinando claves `bubbleId:*` y `composerData:*`; opencode desde `opencode.db` propagando `billedCost` real; amp desde `~/.local/share/amp/threads/*.json` vía `usageLedger`; pi desde `~/.pi/agent/sessions/**/*.jsonl`; t3code desde `~/.t3/**/state.sqlite` con eventos `context-window.updated`.

@@ -1,6 +1,6 @@
 # Daily snapshot publisher failure recovery
 
-Use this procedure only in the affected active machine's dedicated `master` checkout. Set `CHECKOUT`, `MACHINE`, and `LABEL` to that checkout, either `angel-mac` or `mac-m5`, and its installed launchd label. Never use `reset --hard`, `clean`, force-push, or edits to another machine's folder. Retired `old-mac` has no publisher checkout or `launchd` job; preserve its historical snapshots as read-only data.
+Use this procedure only in the affected active machine's dedicated `master` checkout. Set `CHECKOUT`, `MACHINE`, and `LABEL` to that checkout, either `angel-mac` or `mac-m5`, and its installed launchd label. Never use `reset --hard`, `clean`, force-push, snapshot deletion, or edits to another machine's folder. Retired `old-mac` has no publisher checkout or `launchd` job; preserve its historical snapshots as read-only data. For a system-wide post-cutover failure, use the separate [cutover rollback drill](cutover-rollback.md).
 
 ## First response for every failure
 

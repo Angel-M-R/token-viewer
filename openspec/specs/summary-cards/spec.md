@@ -4,15 +4,15 @@
 TBD - created by archiving change fase-3-dashboard-web. Update Purpose after archive.
 ## Requirements
 ### Requirement: Cards de resumen del periodo
-La vista de resumen SHALL mostrar, a partir de `GET /api/v1/stats/summary` con los filtros globales aplicados, cards con: total de tokens, coste estimado en USD, número de requests y número de máquinas activas.
+La vista de resumen SHALL mostrar desde las consultas locales v2 y con los filtros aplicados cards de tokens totales, coste estimado, solicitudes y máquinas activas.
 
 #### Scenario: Carga del resumen
-- **WHEN** el usuario abre el dashboard con un rango de fechas seleccionado
-- **THEN** se muestran las cuatro cards con los totales del periodo devueltos por `stats/summary`
+- **WHEN** el usuario abre el dashboard con un rango seleccionado
+- **THEN** se muestran las cuatro cards con los totales calculados del conjunto local
 
 #### Scenario: Periodo sin datos
-- **WHEN** los filtros seleccionados no devuelven ningún dato
-- **THEN** las cards muestran valores a cero y un estado vacío claro, sin errores
+- **WHEN** los filtros no seleccionan datos
+- **THEN** las cards muestran cero y un estado vacío claro sin errores
 
 ### Requirement: Desglose de tokens en tooltip
 La card de tokens totales SHALL mostrar en un tooltip el desglose por tipo: input, output y cache.
@@ -31,4 +31,3 @@ Cada card SHALL mostrar el delta respecto al periodo inmediatamente anterior de 
 #### Scenario: Periodo anterior sin datos
 - **WHEN** el periodo anterior equivalente no tiene ningún dato
 - **THEN** la card omite el delta (o lo marca como no disponible) en lugar de mostrar un porcentaje engañoso
-

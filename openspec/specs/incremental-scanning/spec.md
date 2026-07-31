@@ -5,7 +5,7 @@ Especifica la capacidad `incremental-scanning` aceptada por la fase 1 del collec
 ## Requirements
 
 ### Requirement: Estado persistente de cursores
-El collector SHALL persistir el estado de escaneo en `collector-state.json` dentro del directorio de estado de la plataforma: `~/.local/state/tokenviewer/` en Linux (respetando `$XDG_STATE_HOME`) y `~/Library/Application Support/tokenviewer/` en macOS. El fichero MUST seguir el esquema `{ "schemaVersion": 1, "files": { "<ruta absoluta>": { "size", "mtimeMs", "lastByteOffset" } }, "lastRunAt": "<ISO 8601>" }` y su escritura MUST ser atómica (escribir a fichero temporal y renombrar).
+El collector SHALL persistir el estado de escaneo en `collector-state.json` dentro del directorio de estado de la plataforma: `~/.local/state/tokenviewer/` en Linux (respetando `$XDG_STATE_HOME`) y `~/Library/Application Support/tokenviewer/` en macOS. El fichero MUST usar el contrato estricto vigente de cursores, última ejecución y commit pendiente, sin campo de versión, y su escritura MUST ser atómica (escribir a fichero temporal y renombrar).
 
 #### Scenario: Primer escaneo crea el estado
 - **WHEN** se ejecuta un escaneo y no existe `collector-state.json`
@@ -15,8 +15,8 @@ El collector SHALL persistir el estado de escaneo en `collector-state.json` dent
 - **WHEN** el proceso muere mientras persiste el estado
 - **THEN** el `collector-state.json` previo permanece válido (nunca queda un JSON truncado)
 
-#### Scenario: Estado corrupto o de versión desconocida
-- **WHEN** `collector-state.json` no es JSON válido o su `schemaVersion` no es reconocida
+#### Scenario: Estado corrupto o con propiedades desconocidas
+- **WHEN** `collector-state.json` no es JSON válido o contiene propiedades no permitidas
 - **THEN** el collector lo descarta con un aviso y procede como escaneo completo
 
 ### Requirement: Escaneo incremental de ficheros JSONL
@@ -57,15 +57,33 @@ El flag `--full` SHALL ignorar todos los cursores guardados y re-escanear el his
 - **THEN** todos los ficheros se procesan desde el inicio y el estado se regenera al completar
 
 ### Requirement: El cursor solo avanza tras confirmación
-Los cursores MUST NOT persistirse hasta que los registros del escaneo hayan sido confirmados por el destino: en modo dry-run, cuando el resumen se ha generado y emitido; en el envío a servidor (fase 2), solo ante respuesta 2xx del ingest. Ante un fallo, el estado previo SHALL conservarse intacto para que la siguiente ejecución reprocese lo pendiente sin pérdida de datos.
+Los cursores MUST NOT persistirse hasta que los agregados hayan sido validados y escritos atómicamente. En publicación, el estado MUST identificar un commit pendiente y conservar información suficiente para reintentarlo; un fallo de validación, escritura, commit o push MUST NOT marcar los días como publicados ni perder datos pendientes.
 
 #### Scenario: Fallo antes de confirmar
-- **WHEN** el proceso falla después de parsear registros pero antes de confirmarlos
-- **THEN** `collector-state.json` conserva los cursores anteriores y el siguiente escaneo vuelve a emitir esos registros
+- **WHEN** el proceso falla después de parsear registros pero antes de confirmar el snapshot
+- **THEN** el estado previo permanece intacto y la siguiente ejecución vuelve a procesar lo pendiente
 
-#### Scenario: Dos ejecuciones consecutivas sin datos nuevos
-- **WHEN** se ejecuta `run` dos veces seguidas sin actividad nueva de los agentes
-- **THEN** la segunda ejecución no re-parsea ficheros ya confirmados y no produce registros duplicados
+#### Scenario: Push fallido después del commit
+- **WHEN** el snapshot queda en un commit local pero el push falla
+- **THEN** el estado conserva el commit pendiente para el siguiente intento
+
+### Requirement: Detección de fechas ausentes
+El collector SHALL comparar para su identidad activa las fechas presentes en las fuentes con los snapshots válidos de su carpeta y MUST reconstruir cualquier fecha ausente sin depender únicamente de `lastRunAt`.
+
+#### Scenario: Hueco entre fechas publicadas
+- **WHEN** existen snapshots de los días 1 y 3 pero las fuentes contienen actividad del día 2
+- **THEN** la siguiente ejecución genera el snapshot v2 del día 2
+
+### Requirement: Estado interno estricto y no versionado
+`collector-state.json` MUST usar un contrato cerrado sin campo `schemaVersion` y MUST aceptar únicamente `files`, `lastRunAt` y `pendingPublicationCommit` con sus tipos vigentes. Un estado que contenga propiedades desconocidas, incluido el anterior `schemaVersion = 1`, MUST seguir el camino existente de estado inválido o desconocido: emitir el warning, usar estado vacío y provocar un escaneo completo. El collector MUST NOT convertir, aceptar por compatibilidad, eliminar ni proporcionar tooling de migración para ese fichero anterior.
+
+#### Scenario: Estado anterior con versión 1
+- **WHEN** el collector carga un `collector-state.json` que todavía contiene `schemaVersion = 1`
+- **THEN** lo rechaza con el warning ordinario, parte de estado vacío y realiza un escaneo completo sin convertir ni eliminar el fichero durante la carga
+
+#### Scenario: Persistencia del estado nuevo
+- **WHEN** el collector confirma cursores o un commit pendiente y persiste el estado
+- **THEN** escribe únicamente los campos permitidos por el contrato estricto y no incluye ningún campo de versión
 
 ### Requirement: Rendimiento del escaneo
 Un escaneo con ~30 días de logs de Claude Code y Codex SHALL completarse en menos de 30 segundos en frío (sin estado) y en menos de 2 segundos en modo incremental.

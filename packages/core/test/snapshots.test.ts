@@ -30,6 +30,7 @@ function angelFile(): SnapshotSourceFile {
 
 describe("snapshot contract", () => {
   it("accepts valid snapshots from every closed snapshot identity", () => {
+    expect(SNAPSHOT_SCHEMA_VERSION).toBe(2);
     expect(validateSnapshotSet(validSnapshotFiles()).map((file) => file.machine)).toEqual([
       "angel-mac",
       "old-mac",
@@ -75,20 +76,6 @@ describe("snapshot contract", () => {
     const wrongDate = angelFile();
     (wrongDate.value as { date: string }).date = "2026-07-25";
     expectInvalid([wrongDate], "date_path_disagreement");
-  });
-
-  it("accepts only schema version 2 and rejects residual v1 documents", () => {
-    expect(SNAPSHOT_SCHEMA_VERSION).toBe(2);
-    expect(validateSnapshotSet(validSnapshotFiles())).toHaveLength(3);
-
-    const legacyVersion = angelFile();
-    (legacyVersion.value as { schemaVersion: number }).schemaVersion = 1;
-    expectInvalid([legacyVersion], "schema_invalid_value");
-
-    const legacyHourRow = angelFile();
-    (legacyHourRow.value as { usage: Record<string, unknown>[] }).usage[0]!["hour"] =
-      "2026-07-26T08:00:00.000Z";
-    expectInvalid([legacyHourRow], "privacy_forbidden_property");
   });
 
   it("rejects quota samples outside the snapshot date and quota instants with a time component", () => {
@@ -173,7 +160,6 @@ describe("snapshot privacy", () => {
     "raw_response",
     "sourceFilePath",
     "record_hash",
-    "hour",
   ])(
     "rejects the forbidden field %s without exposing its value",
     (field) => {

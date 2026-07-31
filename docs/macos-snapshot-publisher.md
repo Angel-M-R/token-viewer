@@ -1,6 +1,6 @@
 # macOS snapshot publisher
 
-The daily publisher is limited to the active identities `angel-mac` and `mac-m5`. Each active Mac must use its own dedicated checkout on `master`, and that checkout must never be used for development. Do not install or activate either job until the migration branch has passed normal review and has been integrated. The retired `old-mac` identity remains valid only for reading its historical snapshots.
+The daily publisher is limited to the active identities `angel-mac` and `mac-m5`. Each active Mac must use its own dedicated checkout on protected `master`, and that checkout must never be used for development. The public repository does not grant push access by visibility: only the authorized owner credentials may publish ordinary fast-forward commits. The retired `old-mac` identity remains valid only for reading its historical snapshots.
 
 Before setup, confirm that the checkout points to the expected repository and that the owner credentials used by both authorized publisher machines have ordinary write access to protected `master`. Use a credential-free SSH or HTTPS remote URL; credentials remain in the user's existing Git configuration and macOS Keychain, never in TokenViewer config or the plist.
 
@@ -10,7 +10,7 @@ Use these values on the Angel Mac:
 
 ```sh
 export CHECKOUT="$HOME/TokenViewer-ops/angel-mac"
-export EXPECTED_REMOTE="git@github.com:OWNER/tokenViewer.git"
+export EXPECTED_REMOTE="git@github.com:Angel-M-R/token-viewer.git"
 export LABEL="com.tokenviewer.collector.angel-mac"
 ```
 
@@ -86,7 +86,7 @@ Use these values on the M5 Mac:
 
 ```sh
 export CHECKOUT="$HOME/TokenViewer-ops/mac-m5"
-export EXPECTED_REMOTE="git@github.com:OWNER/tokenViewer.git"
+export EXPECTED_REMOTE="git@github.com:Angel-M-R/token-viewer.git"
 export LABEL="com.tokenviewer.collector.mac-m5"
 ```
 

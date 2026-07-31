@@ -2,90 +2,52 @@
 
 ## Objetivo
 
-CLI Node (macOS/Linux) que escanea los logs locales de los agentes de IA instalados en la máquina, normaliza cada request a un `UsageRecord` y lo envía por lotes al servidor central. Debe ser **idempotente** (reenviar no duplica), **incremental** (no re-parsear archivos ya procesados) y **de solo lectura** sobre los datos de los agentes.
+CLI Node para `angel-mac` y `mac-m5` que lee fuentes locales, deduplica registros en memoria, calcula costes, agrega por día local `Europe/Madrid`, escribe snapshots v2 y opcionalmente los publica con Git. `old-mac` es histórica y se rechaza como identidad operativa.
 
-## Adaptadores (`packages/adapters`)
+## Adaptadores read-only
 
-Se portan de `references/devrage/src/adapters/` manteniendo su interfaz:
+Los adaptadores normalizan fuentes JSON, JSONL o SQLite de aplicaciones de terceros a `UsageRecord`. El soporte SQLite multi-driver (`node:sqlite` y fallback `better-sqlite3`) abre las fuentes en modo read-only y puede copiar una base bloqueada a un directorio temporal para leerla sin modificar la original.
 
-```ts
-interface Adapter {
-  name: string;                                  // "claude", "codex", ...
-  usage(options?: UsageOptions): AsyncGenerator<UsageRecord>;
-  detect(): Promise<boolean>;                    // ¿está el agente instalado?
-}
-```
+Los registros individuales, hashes, sesiones, proyectos y rutas existen solo durante el procesamiento y nunca se serializan en un snapshot.
 
-| Agente | Fuente local | Formato |
-|---|---|---|
-| claude | `~/.claude/projects/**/*.jsonl` (+ `$CLAUDE_CONFIG_DIR`) | JSONL, líneas `type:"assistant"` con `message.usage`; dedup por `message.id + requestId` (el usage de streaming es acumulativo) |
-| codex | `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl` (+ `$CODEX_HOME`, `archived_sessions`) | JSONL, `event_msg`/`token_count`, modelo desde `turn_context` |
-| cursor | `~/Library/Application Support/Cursor/.../state.vscdb` y XDG en Linux | SQLite, claves `bubbleId:*` (tokenCount) + `composerData:*` (modelo) |
-| opencode | `~/.local/share/opencode/opencode.db` | SQLite, único con `billedCost` real |
-| amp | `~/.local/share/amp/threads/*.json` | JSON con `usageLedger` |
-| pi | `~/.pi/agent/sessions/**/*.jsonl` | JSONL |
-| t3code | `~/.t3/**/state.sqlite` | SQLite, eventos `context-window.updated` |
-| cline | globalStorage VS Code (`saoudrizwan.claude-dev`, roo) | JSON — solo mensajes en devrage; incluir si expone tokens, si no queda fuera de v1 |
-| zed | `~/.local/share/zed` / `~/Library/Application Support/Zed` | JSON + SQLite — igual que cline: solo si expone tokens |
+## Generación incremental
 
-Notas de porte:
-- Conservar el acceso SQLite multi-driver de `src/adapters/sqlite.ts` (node:sqlite → better-sqlite3), siempre read-only (copiar a tmp si el archivo está bloqueado por la app viva).
-- Cada `UsageRecord` gana dos campos nuevos respecto a devrage: `sourceFile` (para el cursor incremental) y `recordHash` (para dedup en servidor, ver spec 02).
-- El campo `project` se extrae cuando la ruta del log lo contenga (Claude Code codifica el proyecto en el directorio).
-
-## Escaneo incremental
-
-Estado en `~/.local/state/tokenviewer/collector-state.json` (XDG; en macOS `~/Library/Application Support/tokenviewer/`):
-
-```jsonc
-{
-  "schemaVersion": 1,
-  "files": {
-    "<ruta absoluta>": { "size": 12345, "mtimeMs": 1712345678901, "lastByteOffset": 12345 }
-  },
-  "lastRunAt": "2026-07-05T10:00:00Z"
-}
-```
-
-- JSONL: si `size` creció y `mtime` cambió, parsear solo desde `lastByteOffset`. Si `size` menguó (rotación), re-parsear entero.
-- SQLite: no hay offset fiable → filtrar por `timestamp > lastRunAt - margen(24h)` y confiar en la dedup del servidor.
-- `--full` fuerza re-escaneo completo (backfill histórico inicial).
-
-## Envío al servidor
-
-- `POST {serverUrl}/api/v1/ingest` con `Authorization: Bearer <machineToken>`, lotes de ≤ 1000 registros, gzip.
-- Respuesta indica `accepted`/`duplicates`; cualquier 2xx confirma el lote y avanza el cursor. Ante fallo de red, el cursor NO avanza (se reintenta en la próxima ejecución).
-- Primer arranque: backfill completo de todo el histórico disponible en los logs.
+- El estado local registra cursores y la última ejecución fuera del repositorio.
+- La carpeta de snapshots validada es la fuente de verdad para detectar días ausentes.
+- Cada ejecución reconstruye días ausentes y regenera el día local abierto.
+- Los días cerrados permanecen inmutables salvo reparación explícita y revisada.
+- Un fallo de validación o publicación conserva el estado confirmado y cualquier commit pendiente.
 
 ## Configuración
 
-`~/.config/tokenviewer/config.json` (crear con `tokenviewer-collector init`, interactivo):
+La configuración local requiere:
 
-```jsonc
-{
-  "serverUrl": "http://server.local:8484",
-  "machineToken": "tv_...",          // emitido por el servidor al registrar la máquina
-  "machineName": "macbook-angel",    // por defecto os.hostname()
-  "agents": ["claude", "codex", "cursor"],  // vacío/ausente = autodetectar todos
-  "intervalMinutes": 15
-}
-```
+- `machineName`: `angel-mac` o `mac-m5`.
+- `checkoutPath`: checkout operativo dedicado en `master`.
+- `expectedRemoteUrl`: remoto público esperado, sin credenciales embebidas.
+- `agents`: adaptadores seleccionados; vacío o ausente autodetecta.
 
-## Comandos CLI
+No existen URL de servidor, token de máquina ni credenciales Git dentro de la configuración.
+
+## Comandos principales
 
 | Comando | Función |
 |---|---|
-| `tokenviewer-collector init` | Configura servidor, registra la máquina y guarda el token |
-| `tokenviewer-collector run` | Un escaneo + envío y termina (para cron) |
-| `tokenviewer-collector watch` | Bucle con `intervalMinutes` (para systemd/launchd) |
-| `tokenviewer-collector run --dry-run` | Escanea y muestra resumen sin enviar (fase 1) |
-| `tokenviewer-collector run --full` | Ignora cursores, re-escanea todo |
-| `tokenviewer-collector status` | Estado: última ejecución, agentes detectados, pendientes |
-| `tokenviewer-collector install-service` | Genera unit de systemd (Linux) o plist de launchd (macOS) para `watch` |
+| `tokenviewer-collector init` | Guarda identidad activa, checkout y remoto esperado |
+| `tokenviewer-collector run` | Genera y valida snapshots locales |
+| `tokenviewer-collector run --dry-run` | Previsualiza únicamente agregados sin escribir ni ejecutar Git |
+| `tokenviewer-collector run --full` | Reescanea todas las fuentes disponibles respetando días cerrados |
+| `tokenviewer-collector run --publish` | Ejecuta generación y publicación Git segura |
+| `tokenviewer-collector status` | Informa cobertura, días ausentes y commit pendiente |
+
+## Publicación
+
+El publicador recupera primero un commit pendiente, ejecuta `git pull --rebase origin master`, genera y valida el conjunto completo, crea un commit solo de la carpeta propia y hace un push ordinario. Los reintentos no fast-forward son limitados. Nunca usa force-push, reset destructivo ni descarta commits creados.
 
 ## Criterios de aceptación
 
-- Ejecutar `run` dos veces seguidas no produce duplicados en el servidor.
-- Un `run` con 30 días de logs de Claude Code + Codex termina en < 30 s en frío y < 2 s incremental.
-- Sin red, `run` falla con exit code ≠ 0 y no pierde datos (siguiente run reenvía).
-- El collector nunca escribe en los directorios de los agentes.
+- Las dos identidades activas escriben exclusivamente en su carpeta.
+- `old-mac` falla antes de escanear, escribir, ejecutar Git o instalar un job.
+- Las bases SQLite de terceros se leen sin escritura.
+- El mismo input produce serialización determinista y no crea commits vacíos.
+- Un fallo de red conserva el commit para la siguiente ejecución.
