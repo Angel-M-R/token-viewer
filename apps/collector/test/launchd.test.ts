@@ -67,6 +67,9 @@ describe.sequential("launchd installer", () => {
     expect(result.stdout).toContain(`com.tokenviewer.collector.${machine}`);
     expect(result.stdout).toContain("<key>WorkingDirectory</key>");
     expect(result.stdout).toContain("<key>PATH</key>");
+    expect(result.stdout).toContain(`<string>${process.execPath}</string>`);
+    const renderedPath = result.stdout.match(/<key>PATH<\/key>\s*<string>([^<]+)<\/string>/)?.[1];
+    expect(renderedPath?.split(":")).toContain(dirname(process.execPath));
     expect(result.stdout).toContain("<key>StartCalendarInterval</key>");
     expect(result.stdout).toContain("run-daily-publisher.mjs");
     expect(result.stdout).toContain("<string>--checkout</string>");

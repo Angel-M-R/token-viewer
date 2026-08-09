@@ -6,8 +6,7 @@
   <string>__LABEL__</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/bin/env</string>
-    <string>node</string>
+    <string>__NODE_EXECUTABLE__</string>
     <string>__CHECKOUT_PATH__/ops/macos/run-daily-publisher.mjs</string>
     <string>--checkout</string>
     <string>__CHECKOUT_PATH__</string>

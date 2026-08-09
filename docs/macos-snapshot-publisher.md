@@ -4,6 +4,8 @@ The daily publisher is limited to the active identities `angel-mac` and `mac-m5`
 
 Before setup, confirm that the checkout points to the expected repository and that the owner credentials used by both authorized publisher machines have ordinary write access to protected `master`. Use a credential-free SSH or HTTPS remote URL; credentials remain in the user's existing Git configuration and macOS Keychain, never in TokenViewer config or the plist.
 
+The installer records the absolute Node executable used during installation and adds that runtime directory to the job `PATH`, so `launchd` does not depend on interactive shell initialization. Reinstall the job after removing or replacing that Node runtime.
+
 ## `angel-mac`
 
 Use these values on the Angel Mac:

@@ -62,8 +62,9 @@ async function main(argv) {
   const template = await readFile(join(scriptDirectory, "com.tokenviewer.collector.plist.template"), "utf8");
   const plist = renderTemplate(template, {
     __LABEL__: label,
+    __NODE_EXECUTABLE__: process.execPath,
     __CHECKOUT_PATH__: checkout,
-    __PATH__: options.path,
+    __PATH__: prependExecutableDirectory(options.path, process.execPath),
     __HOUR__: String(options.hour),
     __MINUTE__: String(options.minute),
     __STDOUT_PATH__: join(logsDirectory, `${options.machine}.out.log`),
@@ -167,6 +168,12 @@ function resolveHome(path) {
   if (path === "~") return homedir();
   if (path.startsWith("~/")) return join(homedir(), path.slice(2));
   return isAbsolute(path) ? path : resolve(path);
+}
+
+function prependExecutableDirectory(path, executable) {
+  const executableDirectory = dirname(executable);
+  const remainingDirectories = path.split(":").filter((directory) => directory && directory !== executableDirectory);
+  return [executableDirectory, ...remainingDirectories].join(":");
 }
 
 function assertCredentialFreeRemote(remote) {
