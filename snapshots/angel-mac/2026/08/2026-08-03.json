@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-08-03",
+  "generatedAt": "2026-08-09T16:18:02.882Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "requests": 78,
+      "inputTokens": 329142,
+      "outputTokens": 21766,
+      "reasoningTokens": 31076,
+      "cacheReadTokens": 5485056,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.23893992000000006,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 78,
+    "inputTokens": 329142,
+    "outputTokens": 21766,
+    "reasoningTokens": 31076,
+    "cacheReadTokens": 5485056,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 0.23893992000000006,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

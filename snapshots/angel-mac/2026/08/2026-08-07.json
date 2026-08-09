@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-08-07",
+  "generatedAt": "2026-08-09T16:18:02.882Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "requests": 10,
+      "inputTokens": 36478,
+      "outputTokens": 957,
+      "reasoningTokens": 292,
+      "cacheReadTokens": 222976,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.33134800000000003,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "requests": 70,
+      "inputTokens": 704174,
+      "outputTokens": 15646,
+      "reasoningTokens": 15410,
+      "cacheReadTokens": 5722624,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 8.852762999999998,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 80,
+    "inputTokens": 740652,
+    "outputTokens": 16603,
+    "reasoningTokens": 15702,
+    "cacheReadTokens": 5945600,
+    "cacheWriteTokens": 0,
+    "estimatedCost": 9.184110999999998,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

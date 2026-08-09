@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-08-01",
+  "generatedAt": "2026-08-09T16:18:02.882Z",
+  "usage": [
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "requests": 542,
+      "inputTokens": 1653093,
+      "outputTokens": 98770,
+      "reasoningTokens": 190951,
+      "cacheReadTokens": 41455104,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 1.5544530400000016,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "anthropic",
+      "model": "claude-opus-5",
+      "requests": 7,
+      "inputTokens": 14,
+      "outputTokens": 2310,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 335785,
+      "cacheWriteTokens": 63155,
+      "estimatedCost": 0.62043125,
+      "billedCost": 0.62043125,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "requests": 339,
+      "inputTokens": 4139400,
+      "outputTokens": 68195,
+      "reasoningTokens": 88719,
+      "cacheReadTokens": 46023168,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 2.5091696399999996,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "requests": 778,
+      "inputTokens": 2615815,
+      "outputTokens": 193104,
+      "reasoningTokens": 223643,
+      "cacheReadTokens": 36099584,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 43.63127699999998,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "requests": 14,
+      "inputTokens": 45647,
+      "outputTokens": 2039,
+      "reasoningTokens": 2451,
+      "cacheReadTokens": 320000,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.0209174,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 1680,
+    "inputTokens": 8453969,
+    "outputTokens": 364418,
+    "reasoningTokens": 505764,
+    "cacheReadTokens": 124233641,
+    "cacheWriteTokens": 63155,
+    "estimatedCost": 48.33624832999999,
+    "billedCost": 0.62043125,
+    "unpricedRequests": 0
+  }
+}
