@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-08-15",
+  "generatedAt": "2026-08-16T07:01:33.067Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "requests": 1,
+      "inputTokens": 10,
+      "outputTokens": 300,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 22689,
+      "cacheWriteTokens": 9806,
+      "estimatedCost": 0.0160364,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 1,
+    "inputTokens": 10,
+    "outputTokens": 300,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 22689,
+    "cacheWriteTokens": 9806,
+    "estimatedCost": 0.0160364,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}
