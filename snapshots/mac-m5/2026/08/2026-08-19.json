@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "mac-m5",
+  "date": "2026-08-19",
+  "generatedAt": "2026-08-20T07:00:23.423Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "requests": 1,
+      "inputTokens": 10,
+      "outputTokens": 71,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 18498,
+      "cacheWriteTokens": 8072,
+      "estimatedCost": 0.0123048,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5",
+      "requests": 45,
+      "inputTokens": 90,
+      "outputTokens": 30464,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 2185143,
+      "cacheWriteTokens": 125988,
+      "estimatedCost": 2.6420464999999993,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "requests": 493,
+      "inputTokens": 1249416,
+      "outputTokens": 95613,
+      "reasoningTokens": 73209,
+      "cacheReadTokens": 51745664,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 40.063964000000006,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "requests": 55,
+      "inputTokens": 194799,
+      "outputTokens": 18648,
+      "reasoningTokens": 13231,
+      "cacheReadTokens": 5370240,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 4.615485,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 594,
+    "inputTokens": 1444315,
+    "outputTokens": 144796,
+    "reasoningTokens": 86440,
+    "cacheReadTokens": 59319545,
+    "cacheWriteTokens": 134060,
+    "estimatedCost": 47.33380030000001,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}
