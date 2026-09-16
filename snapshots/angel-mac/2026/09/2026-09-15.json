@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-09-15",
+  "generatedAt": "2026-09-16T07:08:38.105Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 144,
+      "inputTokens": 4158,
+      "outputTokens": 146757,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 17555968,
+      "cacheWriteTokens": 649386,
+      "estimatedCost": 19.885746999999995,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5",
+      "requests": 15,
+      "inputTokens": 30,
+      "outputTokens": 6079,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 397384,
+      "cacheWriteTokens": 42966,
+      "estimatedCost": 0.6193545,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-6-astra",
+      "requests": 96,
+      "inputTokens": 174913,
+      "outputTokens": 9303,
+      "reasoningTokens": 349,
+      "cacheReadTokens": 10964352,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 13.196082000000002,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 158,
+      "inputTokens": 20319219,
+      "outputTokens": 152925,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 210.83843999999996,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 413,
+    "inputTokens": 20498320,
+    "outputTokens": 315064,
+    "reasoningTokens": 349,
+    "cacheReadTokens": 28917704,
+    "cacheWriteTokens": 692352,
+    "estimatedCost": 244.53962349999995,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

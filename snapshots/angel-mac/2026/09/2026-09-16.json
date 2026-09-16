@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-09-16",
+  "generatedAt": "2026-09-16T07:08:38.105Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 62,
+      "inputTokens": 1804,
+      "outputTokens": 62801,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 4732947,
+      "cacheWriteTokens": 412404,
+      "estimatedCost": 9.496376750000003,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 68,
+      "inputTokens": 5763819,
+      "outputTokens": 66047,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 60.94053999999999,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 130,
+    "inputTokens": 5765623,
+    "outputTokens": 128848,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 4732947,
+    "cacheWriteTokens": 412404,
+    "estimatedCost": 70.43691675,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}
