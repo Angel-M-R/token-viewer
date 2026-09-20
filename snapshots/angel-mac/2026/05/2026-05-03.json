@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2026-05-03",
-  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "generatedAt": "2026-09-19T22:48:04.325Z",
   "usage": [
     {
       "agent": "codex",
@@ -22,13 +22,13 @@
       "agent": "codex",
       "provider": "openai",
       "model": "gpt-5.5",
-      "requests": 1404,
-      "inputTokens": 6055359,
-      "outputTokens": 342930,
-      "reasoningTokens": 133800,
-      "cacheReadTokens": 154598912,
+      "requests": 2037,
+      "inputTokens": 9444799,
+      "outputTokens": 509253,
+      "reasoningTokens": 218607,
+      "cacheReadTokens": 220515200,
       "cacheWriteTokens": 0,
-      "estimatedCost": 136.70895299999998,
+      "estimatedCost": 200.5468150000001,
       "billedCost": 0,
       "unpricedRequests": 0
     },
@@ -49,13 +49,13 @@
   ],
   "quotaSamples": [],
   "totals": {
-    "requests": 1412,
-    "inputTokens": 6096484,
-    "outputTokens": 343574,
-    "reasoningTokens": 134054,
-    "cacheReadTokens": 154715136,
+    "requests": 2045,
+    "inputTokens": 9485924,
+    "outputTokens": 509897,
+    "reasoningTokens": 218861,
+    "cacheReadTokens": 220631424,
     "cacheWriteTokens": 0,
-    "estimatedCost": 136.8542915,
+    "estimatedCost": 200.6921535000001,
     "billedCost": 0,
     "unpricedRequests": 0
   }

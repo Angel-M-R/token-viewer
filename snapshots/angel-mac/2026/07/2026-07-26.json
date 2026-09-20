@@ -2,22 +2,8 @@
   "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2026-07-26",
-  "generatedAt": "2026-07-27T00:45:00.441Z",
+  "generatedAt": "2026-09-19T22:48:04.325Z",
   "usage": [
-    {
-      "agent": "claude",
-      "provider": "anthropic",
-      "model": "claude-haiku-4-5-20251001",
-      "requests": 1,
-      "inputTokens": 10,
-      "outputTokens": 72,
-      "reasoningTokens": 0,
-      "cacheReadTokens": 11609,
-      "cacheWriteTokens": 8556,
-      "estimatedCost": 0.0122259,
-      "billedCost": 0,
-      "unpricedRequests": 0
-    },
     {
       "agent": "opencode",
       "provider": "anthropic",
@@ -28,8 +14,8 @@
       "reasoningTokens": 0,
       "cacheReadTokens": 8970789,
       "cacheWriteTokens": 1316856,
-      "estimatedCost": 15.157394499999999,
-      "billedCost": 15.157394499999999,
+      "estimatedCost": 15.157394499999995,
+      "billedCost": 15.157394499999995,
       "unpricedRequests": 0
     },
     {
@@ -42,7 +28,7 @@
       "reasoningTokens": 168308,
       "cacheReadTokens": 46010880,
       "cacheWriteTokens": 0,
-      "estimatedCost": 53.35096000000003,
+      "estimatedCost": 41.06116000000003,
       "billedCost": 0,
       "unpricedRequests": 0
     },
@@ -56,21 +42,21 @@
       "reasoningTokens": 86891,
       "cacheReadTokens": 9432960,
       "cacheWriteTokens": 0,
-      "estimatedCost": 4.834844,
-      "billedCost": 4.834844,
+      "estimatedCost": 4.834843999999997,
+      "billedCost": 4.834843999999997,
       "unpricedRequests": 0
     }
   ],
   "quotaSamples": [],
   "totals": {
-    "requests": 1283,
-    "inputTokens": 4292329,
-    "outputTokens": 364098,
+    "requests": 1282,
+    "inputTokens": 4292319,
+    "outputTokens": 364026,
     "reasoningTokens": 255199,
-    "cacheReadTokens": 64426238,
-    "cacheWriteTokens": 1325412,
-    "estimatedCost": 73.35542440000003,
-    "billedCost": 19.9922385,
+    "cacheReadTokens": 64414629,
+    "cacheWriteTokens": 1316856,
+    "estimatedCost": 61.05339850000002,
+    "billedCost": 19.992238499999992,
     "unpricedRequests": 0
   }
 }

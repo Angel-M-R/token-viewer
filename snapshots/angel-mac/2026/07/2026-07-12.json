@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2026-07-12",
-  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "generatedAt": "2026-09-19T22:48:04.325Z",
   "usage": [
     {
       "agent": "codex",
@@ -14,7 +14,7 @@
       "reasoningTokens": 49898,
       "cacheReadTokens": 19499776,
       "cacheWriteTokens": 0,
-      "estimatedCost": 20.261788000000003,
+      "estimatedCost": 15.6815024,
       "billedCost": 0,
       "unpricedRequests": 0
     },
@@ -28,7 +28,7 @@
       "reasoningTokens": 529200,
       "cacheReadTokens": 365327872,
       "cacheWriteTokens": 0,
-      "estimatedCost": 422.1313130000001,
+      "estimatedCost": 330.54237640000025,
       "billedCost": 0,
       "unpricedRequests": 0
     },
@@ -55,7 +55,7 @@
     "reasoningTokens": 579098,
     "cacheReadTokens": 384885504,
     "cacheWriteTokens": 0,
-    "estimatedCost": 442.5613090000001,
+    "estimatedCost": 346.39208680000024,
     "billedCost": 0,
     "unpricedRequests": 0
   }

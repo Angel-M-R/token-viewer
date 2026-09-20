@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2026-08-26",
-  "generatedAt": "2026-08-28T07:00:41.173Z",
+  "generatedAt": "2026-09-19T22:48:04.325Z",
   "usage": [
     {
       "agent": "claude",
@@ -42,7 +42,7 @@
       "reasoningTokens": 485,
       "cacheReadTokens": 136448,
       "cacheWriteTokens": 0,
-      "estimatedCost": 0.361939,
+      "estimatedCost": 0.2833672,
       "billedCost": 0,
       "unpricedRequests": 0
     }
@@ -55,7 +55,7 @@
     "reasoningTokens": 2465,
     "cacheReadTokens": 129525245,
     "cacheWriteTokens": 1692783,
-    "estimatedCost": 157.40769966000008,
+    "estimatedCost": 157.32912786000006,
     "billedCost": 0,
     "unpricedRequests": 0
   }

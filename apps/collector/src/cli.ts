@@ -107,6 +107,7 @@ async function main(argv: string[]): Promise<number> {
         "dry-run": { type: "boolean", default: false },
         publish: { type: "boolean", default: false },
         full: { type: "boolean", default: false },
+        "repair-all": { type: "boolean", default: false },
         out: { type: "string" },
         agents: { type: "string" },
         help: { type: "boolean", short: "h", default: false },
@@ -123,6 +124,7 @@ async function main(argv: string[]): Promise<number> {
       dryRun: Boolean(parsed.values["dry-run"]),
       publish: Boolean(parsed.values.publish),
       full: parsed.values.full,
+      repairAll: parsed.values["repair-all"],
       out: parsed.values.out,
       agents: parsed.values.agents?.split(",").map((agent) => agent.trim()).filter(Boolean),
     });
@@ -140,8 +142,8 @@ function printHelp(): void {
 
 Usage:
   tokenviewer-collector init --machine-name <angel-mac|mac-m5> --checkout-path <path> [--expected-remote-url <url>] [--agents claude,codex]
-  tokenviewer-collector run --dry-run [--full] [--out <path>] [--agents claude,codex]
-  tokenviewer-collector run [--publish] [--full] [--agents claude,codex]
+  tokenviewer-collector run --dry-run [--full] [--repair-all] [--out <path>] [--agents claude,codex]
+  tokenviewer-collector run [--publish] [--full] [--repair-all] [--agents claude,codex]
   tokenviewer-collector status
   tokenviewer-collector copilot login
   tokenviewer-collector copilot status

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2026-09-05",
-  "generatedAt": "2026-09-06T07:14:44.602Z",
+  "generatedAt": "2026-09-19T22:48:04.325Z",
   "usage": [
     {
       "agent": "claude",
@@ -14,9 +14,9 @@
       "reasoningTokens": 0,
       "cacheReadTokens": 8317599,
       "cacheWriteTokens": 350628,
-      "estimatedCost": 0,
+      "estimatedCost": 11.897449750000002,
       "billedCost": 0,
-      "unpricedRequests": 115
+      "unpricedRequests": 0
     },
     {
       "agent": "codex",
@@ -28,9 +28,9 @@
       "reasoningTokens": 2825,
       "cacheReadTokens": 5210880,
       "cacheWriteTokens": 0,
-      "estimatedCost": 0,
+      "estimatedCost": 9.26327,
       "billedCost": 0,
-      "unpricedRequests": 79
+      "unpricedRequests": 0
     },
     {
       "agent": "t3code",
@@ -42,9 +42,9 @@
       "reasoningTokens": 0,
       "cacheReadTokens": 0,
       "cacheWriteTokens": 0,
-      "estimatedCost": 0,
+      "estimatedCost": 97.30189999999997,
       "billedCost": 0,
-      "unpricedRequests": 120
+      "unpricedRequests": 0
     },
     {
       "agent": "t3code",
@@ -56,9 +56,9 @@
       "reasoningTokens": 2702,
       "cacheReadTokens": 4751744,
       "cacheWriteTokens": 0,
-      "estimatedCost": 0,
+      "estimatedCost": 7.8156240000000015,
       "billedCost": 0,
-      "unpricedRequests": 66
+      "unpricedRequests": 0
     }
   ],
   "quotaSamples": [],
@@ -69,8 +69,8 @@
     "reasoningTokens": 5527,
     "cacheReadTokens": 18280223,
     "cacheWriteTokens": 350628,
-    "estimatedCost": 0,
+    "estimatedCost": 126.27824374999997,
     "billedCost": 0,
-    "unpricedRequests": 380
+    "unpricedRequests": 0
   }
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "machine": "angel-mac",
   "date": "2025-12-31",
-  "generatedAt": "2026-07-27T00:37:21.754Z",
+  "generatedAt": "2026-09-19T22:48:04.325Z",
   "usage": [
     {
       "agent": "opencode",
@@ -42,8 +42,8 @@
       "reasoningTokens": 29119,
       "cacheReadTokens": 325632,
       "cacheWriteTokens": 0,
-      "estimatedCost": 22.069634999999998,
-      "billedCost": 15.231362999999998,
+      "estimatedCost": 22.069635,
+      "billedCost": 15.231363000000002,
       "unpricedRequests": 0
     },
     {
@@ -69,8 +69,8 @@
     "reasoningTokens": 39453,
     "cacheReadTokens": 3791087,
     "cacheWriteTokens": 408339,
-    "estimatedCost": 26.72054995,
-    "billedCost": 15.231362999999998,
+    "estimatedCost": 26.720549950000002,
+    "billedCost": 15.231363000000002,
     "unpricedRequests": 0
   }
 }

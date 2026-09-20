@@ -126,6 +126,50 @@ describe.sequential("collector local snapshots", () => {
     });
     expect(JSON.stringify(status)).not.toMatch(/gho_|sourceFile|recordHash/);
   });
+
+  it.sequential("repairs yesterday after the day closes", async () => {
+    const root = await collectorRoot("tv-repair-yesterday-");
+    await writeClaudeRecords(root, [claudeRecord("req-1", "2026-07-04T06:00:00.000Z", 3)]);
+
+    await runCollector(
+      { dryRun: false, agents: ["claude"] },
+      { pricing: PRICING, now: () => new Date("2026-07-04T07:00:00.000Z") },
+    );
+
+    await writeClaudeRecords(root, [
+      claudeRecord("req-1", "2026-07-04T06:00:00.000Z", 3),
+      claudeRecord("req-2", "2026-07-04T18:00:00.000Z", 7),
+    ]);
+    const summary = await runCollector(
+      { dryRun: false, agents: ["claude"] },
+      { pricing: PRICING, now: () => NOW },
+    );
+
+    expect(summary.writtenDates).toContain("2026-07-04");
+    expect(await snapshotInputTokens(root, "2026-07-04")).toBe(10);
+  });
+
+  it.sequential("repairs every historical source date only when requested", async () => {
+    const root = await collectorRoot("tv-repair-all-");
+    await writeClaudeRecords(root, [claudeRecord("req-1", "2026-07-03T06:00:00.000Z", 3)]);
+
+    await runCollector(
+      { dryRun: false, agents: ["claude"] },
+      { pricing: PRICING, now: () => new Date("2026-07-03T07:00:00.000Z") },
+    );
+
+    await writeClaudeRecords(root, [
+      claudeRecord("req-1", "2026-07-03T06:00:00.000Z", 3),
+      claudeRecord("req-2", "2026-07-03T18:00:00.000Z", 7),
+    ]);
+    const summary = await runCollector(
+      { dryRun: false, repairAll: true, agents: ["claude"] },
+      { pricing: PRICING, now: () => NOW },
+    );
+
+    expect(summary.writtenDates).toContain("2026-07-03");
+    expect(await snapshotInputTokens(root, "2026-07-03")).toBe(10);
+  });
 });
 
 async function collectorRoot(prefix: string, copilotToken?: string): Promise<string> {
@@ -143,23 +187,41 @@ async function collectorRoot(prefix: string, copilotToken?: string): Promise<str
 }
 
 async function writeClaudeRecord(root: string): Promise<string> {
+  return writeClaudeRecords(root, [claudeRecord("req-1", "2026-07-05T10:00:00.000Z", 3)]);
+}
+
+function claudeRecord(requestId: string, timestamp: string, inputTokens: number): object {
+  return {
+    type: "assistant",
+    requestId,
+    timestamp,
+    message: {
+      id: `msg-${requestId}`,
+      role: "assistant",
+      model: "claude-sonnet-4",
+      usage: { input_tokens: inputTokens, output_tokens: 4 },
+    },
+  };
+}
+
+async function writeClaudeRecords(root: string, records: object[]): Promise<string> {
   const projectDir = join(root, "claude", "projects", "project-a");
   await import("node:fs/promises").then(({ mkdir }) => mkdir(projectDir, { recursive: true }));
   const sourceFile = join(projectDir, "session.jsonl");
   await writeFile(
     sourceFile,
-    `${JSON.stringify({
-      type: "assistant",
-      requestId: "req-1",
-      timestamp: "2026-07-05T10:00:00.000Z",
-      message: {
-        id: "msg-1",
-        role: "assistant",
-        model: "claude-sonnet-4",
-        usage: { input_tokens: 3, output_tokens: 4 },
-      },
-    })}\n`,
+    `${records.map((record) => JSON.stringify(record)).join("\n")}\n`,
     "utf8",
   );
   return sourceFile;
+}
+
+async function snapshotInputTokens(root: string, date: string): Promise<number> {
+  const snapshot = JSON.parse(
+    await readFile(
+      join(root, "snapshots", "angel-mac", date.slice(0, 4), date.slice(5, 7), `${date}.json`),
+      "utf8",
+    ),
+  ) as { totals: { inputTokens: number } };
+  return snapshot.totals.inputTokens;
 }

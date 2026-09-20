@@ -7,6 +7,7 @@ import {
   createFilePricingCatalogCache,
   discoverAvailableSourceDates,
   generateDailySnapshots,
+  localSnapshotDate,
   loadPricingCatalog,
   planDailySnapshots,
   stateDir,
@@ -29,6 +30,7 @@ export interface RunOptions {
   dryRun: boolean;
   publish?: boolean;
   full?: boolean;
+  repairAll?: boolean;
   out?: string;
   agents?: string[];
 }
@@ -91,6 +93,8 @@ export async function runCollector(
   const newFiles: FileCursorMap = {};
   const records = await collectRecords(selectedAdapters, newFiles, warnings);
   const now = dependencies.now?.() ?? new Date();
+  const sourceDates = [...discoverAvailableSourceDates(records)];
+  const repairClosedDates = closedDatesToRepair(sourceDates, now, Boolean(options.repairAll));
   const pricing =
     dependencies.pricing ??
     (await loadPricingCatalog(createFilePricingCatalogCache(join(stateDir(), "models-dev-cache.json")), {
@@ -113,6 +117,7 @@ export async function runCollector(
           records,
           pricing,
           now,
+          repairClosedDates,
         })
       : generateDailySnapshots({
           repositoryRoot: config.checkoutPath,
@@ -120,6 +125,7 @@ export async function runCollector(
           records,
           pricing,
           now,
+          repairClosedDates,
           quotaSamples: quota ? [quota] : [],
         });
   let publication: CollectorRunSummary["publication"];
@@ -182,6 +188,22 @@ export async function runCollector(
   }
 
   return summary;
+}
+
+function closedDatesToRepair(
+  sourceDates: readonly string[],
+  now: Date,
+  repairAll: boolean,
+): string[] {
+  const openDate = localSnapshotDate(now);
+  if (!openDate) throw new TypeError("now must be a valid date");
+
+  if (repairAll) return sourceDates.filter((date) => date < openDate);
+
+  const previousDate = new Date(`${openDate}T00:00:00.000Z`);
+  previousDate.setUTCDate(previousDate.getUTCDate() - 1);
+  const previousDay = previousDate.toISOString().slice(0, 10);
+  return sourceDates.includes(previousDay) ? [previousDay] : [];
 }
 
 export async function statusCollector(): Promise<StatusResult> {
