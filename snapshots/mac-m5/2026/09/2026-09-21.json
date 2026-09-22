@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "mac-m5",
+  "date": "2026-09-21",
+  "generatedAt": "2026-09-22T07:00:22.269Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 426,
+      "inputTokens": 966,
+      "outputTokens": 235793,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 62089383,
+      "cacheWriteTokens": 1136319,
+      "estimatedCost": 41.52564324999999,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "openai",
+      "model": "gpt-5.6-sol",
+      "requests": 175,
+      "inputTokens": 410720,
+      "outputTokens": 44026,
+      "reasoningTokens": 28032,
+      "cacheReadTokens": 12581376,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 8.116590400000005,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 601,
+    "inputTokens": 411686,
+    "outputTokens": 279819,
+    "reasoningTokens": 28032,
+    "cacheReadTokens": 74670759,
+    "cacheWriteTokens": 1136319,
+    "estimatedCost": 49.642233649999994,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}
