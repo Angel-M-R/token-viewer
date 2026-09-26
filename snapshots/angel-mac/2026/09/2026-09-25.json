@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-09-25",
+  "generatedAt": "2026-09-26T07:00:44.305Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 5,
+      "inputTokens": 10,
+      "outputTokens": 2054,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 238556,
+      "cacheWriteTokens": 26435,
+      "estimatedCost": 0.22100619999999999,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 5,
+    "inputTokens": 10,
+    "outputTokens": 2054,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 238556,
+    "cacheWriteTokens": 26435,
+    "estimatedCost": 0.22100619999999999,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}

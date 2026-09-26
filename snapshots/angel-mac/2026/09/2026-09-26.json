@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-09-26",
+  "generatedAt": "2026-09-26T07:00:44.305Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 2,
+      "inputTokens": 4,
+      "outputTokens": 289,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 42994,
+      "cacheWriteTokens": 20226,
+      "estimatedCost": 0.1155248,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-6-astra",
+      "requests": 304,
+      "inputTokens": 827699,
+      "outputTokens": 73727,
+      "reasoningTokens": 13039,
+      "cacheReadTokens": 24730624,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 37.34591400000001,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 3,
+      "inputTokens": 95043,
+      "outputTokens": 379,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0.387752,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "openai",
+      "model": "gpt-6-astra",
+      "requests": 236,
+      "inputTokens": 511013,
+      "outputTokens": 61313,
+      "reasoningTokens": 12933,
+      "cacheReadTokens": 21673984,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 30.49641400000003,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 545,
+    "inputTokens": 1433759,
+    "outputTokens": 135708,
+    "reasoningTokens": 25972,
+    "cacheReadTokens": 46447602,
+    "cacheWriteTokens": 20226,
+    "estimatedCost": 68.34560480000005,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}
