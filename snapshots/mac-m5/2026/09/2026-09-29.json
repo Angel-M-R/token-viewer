@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "machine": "mac-m5",
+  "date": "2026-09-29",
+  "generatedAt": "2026-09-30T07:00:31.255Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 36,
+      "inputTokens": 74,
+      "outputTokens": 10988,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 2493725,
+      "cacheWriteTokens": 153634,
+      "estimatedCost": 1.4869709999999998,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-6-astra",
+      "requests": 678,
+      "inputTokens": 973845,
+      "outputTokens": 107033,
+      "reasoningTokens": 30608,
+      "cacheReadTokens": 83421824,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 128.544773,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "codex",
+      "provider": "openai",
+      "model": "gpt-6-sol",
+      "requests": 322,
+      "inputTokens": 707559,
+      "outputTokens": 47873,
+      "reasoningTokens": 25253,
+      "cacheReadTokens": 35668864,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 9.870142400000004,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "openai",
+      "model": "gpt-6-astra",
+      "requests": 343,
+      "inputTokens": 626927,
+      "outputTokens": 74222,
+      "reasoningTokens": 27851,
+      "cacheReadTokens": 41688448,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 66.90294599999991,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "openai",
+      "model": "gpt-6.1-sol",
+      "requests": 336,
+      "inputTokens": 347402,
+      "outputTokens": 32866,
+      "reasoningTokens": 2770,
+      "cacheReadTokens": 41938688,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 336
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 1715,
+    "inputTokens": 2655807,
+    "outputTokens": 272982,
+    "reasoningTokens": 86482,
+    "cacheReadTokens": 205211549,
+    "cacheWriteTokens": 153634,
+    "estimatedCost": 206.8048323999999,
+    "billedCost": 0,
+    "unpricedRequests": 336
+  }
+}
