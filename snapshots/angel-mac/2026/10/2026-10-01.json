@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "machine": "angel-mac",
+  "date": "2026-10-01",
+  "generatedAt": "2026-10-01T07:00:49.327Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 39,
+      "inputTokens": 1068,
+      "outputTokens": 33656,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 10634888,
+      "cacheWriteTokens": 309307,
+      "estimatedCost": 8.2185395,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 186,
+      "inputTokens": 372,
+      "outputTokens": 92607,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 20606891,
+      "cacheWriteTokens": 353349,
+      "estimatedCost": 7.7417511999999995,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "anthropic",
+      "model": "claude-fable-5-1",
+      "requests": 44,
+      "inputTokens": 12427284,
+      "outputTokens": 35330,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 126.03934000000002,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "t3code",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 207,
+      "inputTokens": 23517977,
+      "outputTokens": 98131,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "estimatedCost": 96.03452800000001,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 476,
+    "inputTokens": 35946701,
+    "outputTokens": 259724,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 31241779,
+    "cacheWriteTokens": 662656,
+    "estimatedCost": 238.03415870000003,
+    "billedCost": 0,
+    "unpricedRequests": 0
+  }
+}
