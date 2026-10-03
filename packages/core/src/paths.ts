@@ -116,24 +116,40 @@ export function piSessionsDir(context?: PathContext): string {
   return join(homePath(context), ".pi", "agent", "sessions");
 }
 
+export function ompSessionsDir(context?: PathContext): string {
+  return join(homePath(context), ".omp", "agent", "sessions");
+}
+
 export function t3DatabaseCandidates(context?: PathContext): T3DatabaseLocation[] {
   const locations: T3DatabaseLocation[] = [];
   const seen = new Set<string>();
   const explicitState = envValue(context, "T3CODE_STATE_DIR");
 
   if (explicitState) {
-    addT3Location(locations, seen, join(resolveHomePath(explicitState, context), "state.sqlite"), "state");
+    addT3StateDir(locations, seen, resolveHomePath(explicitState, context), "state");
   }
 
   for (const baseDir of uniqueStrings([
     envValue(context, "T3CODE_HOME"),
     join(homePath(context), ".t3"),
   ])) {
-    addT3Location(locations, seen, join(resolveHomePath(baseDir, context), "userdata", "state.sqlite"), "userdata");
-    addT3Location(locations, seen, join(resolveHomePath(baseDir, context), "dev", "state.sqlite"), "dev");
+    addT3StateDir(locations, seen, join(resolveHomePath(baseDir, context), "userdata"), "userdata");
+    addT3StateDir(locations, seen, join(resolveHomePath(baseDir, context), "dev"), "dev");
   }
 
   return locations;
+}
+
+// T3 Code v2 migrates state.sqlite into statev2.sqlite, keeping legacy event ids. Both share
+// a scope so the adapter can dedupe the imported history; the legacy file is listed first.
+function addT3StateDir(
+  locations: T3DatabaseLocation[],
+  seen: Set<string>,
+  dir: string,
+  scope: string,
+): void {
+  addT3Location(locations, seen, join(dir, "state.sqlite"), scope);
+  addT3Location(locations, seen, join(dir, "statev2.sqlite"), scope);
 }
 
 function addT3Location(

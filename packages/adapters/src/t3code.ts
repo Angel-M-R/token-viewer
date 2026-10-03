@@ -7,10 +7,35 @@ import {
   type UsageRecord,
 } from "@tokenviewer/core";
 import { completeSqliteSource, shouldUseSqliteSource } from "./source-files.js";
-import { openReadonlySqliteDatabase, type SqliteDatabase } from "./sqlite.js";
+import {
+  hasColumns,
+  openReadonlySqliteDatabase,
+  tableColumns,
+  tableExists,
+  type SqliteDatabase,
+} from "./sqlite.js";
 import { asRecord, stringValue, withRecordHash } from "./utils.js";
 
 interface ThreadInfo {
+  provider?: string;
+  model?: string;
+}
+
+interface EventRow {
+  event_id: unknown;
+  stream_id: unknown;
+  event_type: unknown;
+  occurred_at: unknown;
+  payload_json: unknown;
+  run_payload_json: unknown;
+}
+
+interface UsageEntry {
+  usage: ParsedUsage;
+  threadId?: string;
+  turnId?: string;
+  usageId: string;
+  timestamp?: string;
   provider?: string;
   model?: string;
 }
@@ -84,77 +109,137 @@ function* queryUsageRecords(
   }
 
   const threadInfo = readThreadInfo(db);
+  const v2ThreadInfo = readV2ThreadInfo(db);
+  const joinRuns =
+    hasColumns(db, "orchestration_v2_projection_nodes", ["node_id", "run_id"]) &&
+    hasColumns(db, "orchestration_v2_projection_runs", ["run_id", "payload_json"]);
   const orderColumn = hasColumns(db, "orchestration_events", ["sequence"]) ? "sequence" : "event_id";
   let query = `
-    SELECT event_id, stream_id, occurred_at, payload_json
-    FROM orchestration_events
-    WHERE event_type = 'thread.activity-appended'
+    SELECT e.event_id, e.stream_id, e.event_type, e.occurred_at, e.payload_json,
+      ${joinRuns ? "r.payload_json" : "NULL"} AS run_payload_json
+    FROM orchestration_events e
+    ${
+      joinRuns
+        ? `LEFT JOIN orchestration_v2_projection_nodes n
+            ON e.event_type = 'provider-turn.updated'
+            AND n.node_id = json_extract(e.payload_json, '$.nodeId')
+          LEFT JOIN orchestration_v2_projection_runs r ON r.run_id = n.run_id`
+        : ""
+    }
+    WHERE e.event_type IN ('thread.activity-appended', 'provider-turn.updated')
   `;
   const params: unknown[] = [];
   if (options?.since) {
-    query += ` AND occurred_at >= ?`;
+    query += ` AND e.occurred_at >= ?`;
     params.push(options.since.toISOString());
   }
-  query += ` ORDER BY occurred_at ASC, ${orderColumn} ASC`;
+  query += ` ORDER BY e.occurred_at ASC, e.${orderColumn} ASC`;
 
-  let rows: {
-    event_id: unknown;
-    stream_id: unknown;
-    occurred_at: unknown;
-    payload_json: unknown;
-  }[];
+  let rows: EventRow[];
   try {
-    rows = db.prepare(query).all(...params) as typeof rows;
+    rows = db.prepare(query).all(...params) as EventRow[];
   } catch {
     return;
   }
 
   for (const row of rows) {
     const payload = asRecord(parseJson(row.payload_json));
-    const activity = asRecord(payload?.["activity"]);
-    if (activity?.["kind"] !== "context-window.updated") {
+    const entry =
+      row.event_type === "provider-turn.updated"
+        ? parseProviderTurnUsage(row, payload, v2ThreadInfo, threadInfo)
+        : parseActivityUsage(row, payload, threadInfo);
+    if (!entry || !hasBillableUsage(entry.usage)) {
       continue;
     }
 
-    const usage = parseUsageSnapshot(activity["payload"]);
-    if (!usage || !hasBillableUsage(usage)) {
+    // Keyed on nativeId rather than recordHash: statev2.sqlite re-imports the legacy events
+    // of state.sqlite under the same ids, and recordHash also covers sourceFile.
+    const nativeId = JSON.stringify([location.scope, entry.threadId ?? "", entry.turnId ?? "", entry.usageId]);
+    if (seen.has(nativeId)) {
       continue;
     }
+    seen.add(nativeId);
 
-    const threadId = stringValue(payload?.["threadId"]) ?? stringValue(row.stream_id);
-    const timestamp = stringValue(activity["createdAt"]) ?? stringValue(row.occurred_at);
-    const turnId = stringValue(activity["turnId"]);
-    const info = threadId ? threadInfo.get(threadId) : undefined;
-    const provider = normalizeT3Provider(info?.provider, info?.model);
-    const nativeId = JSON.stringify([
-      location.scope,
-      threadId ?? "",
-      turnId ?? "",
-      stringValue(row.event_id) ?? "",
-    ]);
-
-    const record = withRecordHash({
+    yield withRecordHash({
       agent: "t3code",
-      provider,
-      model: info?.model,
-      timestamp,
-      session: threadId,
+      provider: normalizeT3Provider(entry.provider, entry.model),
+      model: entry.model,
+      timestamp: entry.timestamp,
+      session: entry.threadId,
       project: location.scope,
-      inputTokens: usage.inputTokens,
-      outputTokens: usage.outputTokens,
-      reasoningTokens: usage.reasoningTokens,
-      cacheReadTokens: usage.cacheReadTokens,
-      cacheWriteTokens: usage.cacheWriteTokens,
+      inputTokens: entry.usage.inputTokens,
+      outputTokens: entry.usage.outputTokens,
+      reasoningTokens: entry.usage.reasoningTokens,
+      cacheReadTokens: entry.usage.cacheReadTokens,
+      cacheWriteTokens: entry.usage.cacheWriteTokens,
       sourceFile: location.path,
       nativeId,
     });
-
-    if (seen.has(record.recordHash)) {
-      continue;
-    }
-    seen.add(record.recordHash);
-    yield record;
   }
+}
+
+/** T3 Code v1: `context-window.updated` activities appended to the thread. */
+function parseActivityUsage(
+  row: EventRow,
+  payload: Record<string, unknown> | null,
+  threadInfo: Map<string, ThreadInfo>,
+): UsageEntry | null {
+  const activity = asRecord(payload?.["activity"]);
+  if (activity?.["kind"] !== "context-window.updated") {
+    return null;
+  }
+
+  const usage = parseUsageSnapshot(activity["payload"]);
+  if (!usage) {
+    return null;
+  }
+
+  const threadId = stringValue(payload?.["threadId"]) ?? stringValue(row.stream_id);
+  const info = threadId ? threadInfo.get(threadId) : undefined;
+  return {
+    usage,
+    threadId,
+    turnId: stringValue(activity["turnId"]),
+    usageId: stringValue(row.event_id) ?? "",
+    timestamp: stringValue(activity["createdAt"]) ?? stringValue(row.occurred_at),
+    provider: info?.provider,
+    model: info?.model,
+  };
+}
+
+/**
+ * T3 Code v2: each provider request refreshes the turn's `tokenUsage` snapshot, so every
+ * distinct `updatedAt` is one request. Status-only updates repeat the last snapshot.
+ */
+function parseProviderTurnUsage(
+  row: EventRow,
+  payload: Record<string, unknown> | null,
+  v2ThreadInfo: Map<string, ThreadInfo>,
+  threadInfo: Map<string, ThreadInfo>,
+): UsageEntry | null {
+  const tokenUsage = asRecord(payload?.["tokenUsage"]);
+  const usage = parseUsageSnapshot(tokenUsage);
+  if (!usage) {
+    return null;
+  }
+
+  const threadId = stringValue(row.stream_id);
+  const run = asRecord(parseJson(row.run_payload_json));
+  const runSelection = asRecord(run?.["modelSelection"]);
+  const thread = threadId ? (v2ThreadInfo.get(threadId) ?? threadInfo.get(threadId)) : undefined;
+  const updatedAt = stringValue(tokenUsage?.["updatedAt"]);
+  return {
+    usage,
+    threadId,
+    turnId: stringValue(payload?.["id"]),
+    usageId: updatedAt ?? stringValue(row.event_id) ?? "",
+    timestamp: updatedAt ?? stringValue(row.occurred_at),
+    provider:
+      stringValue(asRecord(payload?.["nativeTurnRef"])?.["driver"]) ??
+      stringValue(run?.["providerInstanceId"]) ??
+      thread?.provider,
+    model: stringValue(runSelection?.["model"]) ?? thread?.model,
+  };
 }
 
 function normalizeT3Provider(
@@ -200,6 +285,36 @@ function readThreadInfo(db: SqliteDatabase): Map<string, ThreadInfo> {
 
   readProjectionThreadModels(db, info);
   readProjectionThreadProviders(db, info);
+
+  return info;
+}
+
+function readV2ThreadInfo(db: SqliteDatabase): Map<string, ThreadInfo> {
+  const info = new Map<string, ThreadInfo>();
+  if (!hasColumns(db, "orchestration_v2_projection_threads", ["thread_id", "payload_json"])) {
+    return info;
+  }
+
+  try {
+    const rows = db
+      .prepare("SELECT thread_id, payload_json FROM orchestration_v2_projection_threads")
+      .all() as { thread_id: unknown; payload_json: unknown }[];
+    for (const row of rows) {
+      const threadId = stringValue(row.thread_id);
+      const payload = asRecord(parseJson(row.payload_json));
+      const modelSelection = asRecord(payload?.["modelSelection"]);
+      if (!threadId || !payload) {
+        continue;
+      }
+      info.set(threadId, {
+        model: stringValue(modelSelection?.["model"]),
+        provider:
+          stringValue(payload["providerInstanceId"]) ?? stringValue(modelSelection?.["instanceId"]),
+      });
+    }
+  } catch {
+    return info;
+  }
 
   return info;
 }
@@ -357,35 +472,6 @@ function hasBillableUsage(usage: ParsedUsage): boolean {
       usage.cacheWriteTokens >
     0
   );
-}
-
-function hasColumns(db: SqliteDatabase, table: string, requiredColumns: string[]): boolean {
-  const columns = tableColumns(db, table);
-  return requiredColumns.every((column) => columns.has(column));
-}
-
-function tableExists(db: SqliteDatabase, table: string): boolean {
-  try {
-    const row = db
-      .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1")
-      .get(table);
-    return Boolean(row);
-  } catch {
-    return false;
-  }
-}
-
-function tableColumns(db: SqliteDatabase, table: string): Set<string> {
-  if (!tableExists(db, table)) {
-    return new Set();
-  }
-
-  try {
-    const rows = db.prepare(`PRAGMA table_info("${table}")`).all() as { name: unknown }[];
-    return new Set(rows.flatMap((row) => stringValue(row.name) ?? []));
-  } catch {
-    return new Set();
-  }
 }
 
 function parseJson(value: unknown): unknown | null {

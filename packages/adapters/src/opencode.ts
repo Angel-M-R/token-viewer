@@ -6,7 +6,7 @@ import {
   type UsageRecord,
 } from "@tokenviewer/core";
 import { completeSqliteSource, shouldUseSqliteSource } from "./source-files.js";
-import { openReadonlySqliteDatabase, type SqliteDatabase } from "./sqlite.js";
+import { hasColumns, openReadonlySqliteDatabase, type SqliteDatabase } from "./sqlite.js";
 import { numberValue, stringValue, withRecordHash } from "./utils.js";
 
 export function opencodeAdapter(): Adapter {
@@ -58,12 +58,41 @@ function* queryUsageRecords(
   sourceFile: string,
   options?: UsageOptions,
 ): Generator<UsageRecord> {
-  let where = `WHERE json_type(data, '$.tokens') = 'object'`;
+  const hasLegacyMessages = hasColumns(db, "message", ["id", "session_id", "time_created", "data"]);
+  // opencode 2 moved messages to session_message and imported the legacy rows under the same
+  // ids, so v2 rows are read only when the legacy table does not already hold them.
+  const hasSessionMessages = hasColumns(db, "session_message", [
+    "id",
+    "session_id",
+    "type",
+    "time_created",
+    "data",
+  ]);
   const params: unknown[] = [];
-
-  if (options?.since) {
-    where += ` AND time_created >= ?`;
+  const sources: string[] = [];
+  const sinceFilter = () => {
+    if (!options?.since) {
+      return "";
+    }
     params.push(options.since.getTime());
+    return ` AND time_created >= ?`;
+  };
+
+  if (hasLegacyMessages) {
+    sources.push(`
+      SELECT id, session_id, time_created, data FROM message
+      WHERE json_type(data, '$.tokens') = 'object'${sinceFilter()}
+    `);
+  }
+  if (hasSessionMessages) {
+    sources.push(`
+      SELECT id, session_id, time_created, data FROM session_message
+      WHERE type = 'assistant' AND json_type(data, '$.tokens') = 'object'${sinceFilter()}
+      ${hasLegacyMessages ? "AND id NOT IN (SELECT id FROM message)" : ""}
+    `);
+  }
+  if (sources.length === 0) {
+    return;
   }
 
   const rows = db
@@ -73,15 +102,18 @@ function* queryUsageRecords(
       session_id,
       time_created,
       COALESCE(json_extract(data, '$.providerID'), json_extract(data, '$.model.providerID')) AS provider,
-      COALESCE(json_extract(data, '$.modelID'), json_extract(data, '$.model.modelID')) AS model,
+      COALESCE(
+        json_extract(data, '$.modelID'),
+        json_extract(data, '$.model.modelID'),
+        json_extract(data, '$.model.id')
+      ) AS model,
       json_extract(data, '$.cost') AS billed_cost,
       json_extract(data, '$.tokens.input') AS input_tokens,
       json_extract(data, '$.tokens.output') AS output_tokens,
       json_extract(data, '$.tokens.reasoning') AS reasoning_tokens,
       json_extract(data, '$.tokens.cache.read') AS cache_read_tokens,
       json_extract(data, '$.tokens.cache.write') AS cache_write_tokens
-    FROM message
-    ${where}
+    FROM (${sources.join(" UNION ALL ")})
     ORDER BY time_created ASC
   `)
     .all(...params) as {

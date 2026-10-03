@@ -3,9 +3,14 @@ import { claudeAdapter } from "./claude.js";
 import { codexAdapter } from "./codex.js";
 import { cursorAdapter } from "./cursor.js";
 import { opencodeAdapter } from "./opencode.js";
-import { piAdapter } from "./pi.js";
+import { ompAdapter, piAdapter } from "./pi.js";
 import { t3codeAdapter } from "./t3code.js";
-import { ADAPTER_NAMES, type Adapter, type AdapterName } from "@tokenviewer/core";
+import {
+  ADAPTER_NAMES,
+  OPT_IN_ADAPTER_NAMES,
+  type Adapter,
+  type AdapterName,
+} from "@tokenviewer/core";
 
 const ADAPTERS: Record<AdapterName, () => Adapter> = {
   claude: claudeAdapter,
@@ -14,6 +19,7 @@ const ADAPTERS: Record<AdapterName, () => Adapter> = {
   opencode: opencodeAdapter,
   amp: ampAdapter,
   pi: piAdapter,
+  omp: ompAdapter,
   t3code: t3codeAdapter,
 };
 
@@ -25,8 +31,11 @@ export function createAdapter(name: string): Adapter {
   return ADAPTERS[name]();
 }
 
+/** Adapters collected by default; opt-in adapters must be named in the collector config. */
 export function allAdapters(): Adapter[] {
-  return ADAPTER_NAMES.map((name) => ADAPTERS[name]());
+  return ADAPTER_NAMES.filter((name) => !OPT_IN_ADAPTER_NAMES.includes(name)).map((name) =>
+    ADAPTERS[name](),
+  );
 }
 
 function isAdapterName(name: string): name is AdapterName {
@@ -38,6 +47,6 @@ export { claudeAdapter } from "./claude.js";
 export { codexAdapter } from "./codex.js";
 export { cursorAdapter } from "./cursor.js";
 export { opencodeAdapter } from "./opencode.js";
-export { piAdapter } from "./pi.js";
+export { ompAdapter, piAdapter } from "./pi.js";
 export { t3codeAdapter } from "./t3code.js";
 export * from "./sqlite.js";

@@ -2,6 +2,7 @@ import { copyFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { fileExistsSync } from "./source-files.js";
+import { stringValue } from "./utils.js";
 
 export interface SqliteStatement {
   all(...params: unknown[]): unknown[];
@@ -36,6 +37,35 @@ export async function openReadonlySqliteDatabase(dbPath: string): Promise<Sqlite
   }
 
   return openCopiedDatabase(dbPath, loaders);
+}
+
+export function hasColumns(db: SqliteDatabase, table: string, requiredColumns: string[]): boolean {
+  const columns = tableColumns(db, table);
+  return requiredColumns.every((column) => columns.has(column));
+}
+
+export function tableExists(db: SqliteDatabase, table: string): boolean {
+  try {
+    const row = db
+      .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1")
+      .get(table);
+    return Boolean(row);
+  } catch {
+    return false;
+  }
+}
+
+export function tableColumns(db: SqliteDatabase, table: string): Set<string> {
+  if (!tableExists(db, table)) {
+    return new Set();
+  }
+
+  try {
+    const rows = db.prepare(`PRAGMA table_info("${table}")`).all() as { name: unknown }[];
+    return new Set(rows.flatMap((row) => stringValue(row.name) ?? []));
+  } catch {
+    return new Set();
+  }
 }
 
 type DriverLoader = (dbPath: string) => Promise<SqliteDatabase>;

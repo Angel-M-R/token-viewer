@@ -1,24 +1,41 @@
 import { stat } from "node:fs/promises";
 import { basename } from "node:path";
-import { piSessionsDir, type Adapter, type UsageOptions, type UsageRecord } from "@tokenviewer/core";
+import {
+  ompSessionsDir,
+  piSessionsDir,
+  type Adapter,
+  type AdapterName,
+  type UsageOptions,
+  type UsageRecord,
+} from "@tokenviewer/core";
 import { readCompleteJsonlLines, walkFiles } from "./source-files.js";
 import { asRecord, isAtOrAfter, numberValue, stringValue, withRecordHash } from "./utils.js";
 
 export function piAdapter(): Adapter {
+  return piSessionsAdapter("pi", piSessionsDir);
+}
+
+/** oh-my-pi (`omp`) is a pi fork that keeps pi's session JSONL format under ~/.omp. */
+export function ompAdapter(): Adapter {
+  return piSessionsAdapter("omp", ompSessionsDir);
+}
+
+function piSessionsAdapter(name: AdapterName, sessionsDir: () => string): Adapter {
   return {
-    name: "pi",
+    name,
     async detect(): Promise<boolean> {
-      return Boolean(await stat(piSessionsDir()).catch(() => null));
+      return Boolean(await stat(sessionsDir()).catch(() => null));
     },
     async *usage(options?: UsageOptions): AsyncGenerator<UsageRecord> {
-      for await (const filePath of walkFiles(piSessionsDir(), (file) => file.endsWith(".jsonl"))) {
-        yield* parsePiUsageJsonl(filePath, options);
+      for await (const filePath of walkFiles(sessionsDir(), (file) => file.endsWith(".jsonl"))) {
+        yield* parsePiUsageJsonl(name, filePath, options);
       }
     },
   };
 }
 
 async function* parsePiUsageJsonl(
+  agent: AdapterName,
   filePath: string,
   options?: UsageOptions,
 ): AsyncGenerator<UsageRecord> {
@@ -67,7 +84,7 @@ async function* parsePiUsageJsonl(
 
       const responseModel = stringValue(message["responseModel"]);
       yield withRecordHash({
-        agent: "pi",
+        agent,
         provider: responseModel?.includes("/") ? undefined : stringValue(message["provider"]),
         model: responseModel ?? stringValue(message["model"]),
         timestamp,
