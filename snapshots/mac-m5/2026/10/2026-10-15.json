@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "mac-m5",
+  "date": "2026-10-15",
+  "generatedAt": "2026-10-16T07:00:35.594Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 627,
+      "inputTokens": 1276,
+      "outputTokens": 335655,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 68081750,
+      "cacheWriteTokens": 1712492,
+      "estimatedCost": 28.89701400000003,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    },
+    {
+      "agent": "opencode",
+      "provider": "github-copilot",
+      "model": "claude-opus-5.5",
+      "requests": 254,
+      "inputTokens": 10932,
+      "outputTokens": 77596,
+      "reasoningTokens": 77300,
+      "cacheReadTokens": 36071594,
+      "cacheWriteTokens": 907912,
+      "estimatedCost": 14.895526799999995,
+      "billedCost": 10.664341800000003,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 881,
+    "inputTokens": 12208,
+    "outputTokens": 413251,
+    "reasoningTokens": 77300,
+    "cacheReadTokens": 104153344,
+    "cacheWriteTokens": 2620404,
+    "estimatedCost": 43.792540800000026,
+    "billedCost": 10.664341800000003,
+    "unpricedRequests": 0
+  }
+}
