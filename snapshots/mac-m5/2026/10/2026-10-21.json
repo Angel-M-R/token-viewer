@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "machine": "mac-m5",
+  "date": "2026-10-21",
+  "generatedAt": "2026-10-23T07:01:16.938Z",
+  "usage": [
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-haiku-5-5",
+      "requests": 3,
+      "inputTokens": 6,
+      "outputTokens": 2281,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 3312,
+      "cacheWriteTokens": 15549,
+      "estimatedCost": 0,
+      "billedCost": 0,
+      "unpricedRequests": 3
+    },
+    {
+      "agent": "claude",
+      "provider": "anthropic",
+      "model": "claude-opus-5-5",
+      "requests": 1030,
+      "inputTokens": 2086,
+      "outputTokens": 815178,
+      "reasoningTokens": 0,
+      "cacheReadTokens": 198734970,
+      "cacheWriteTokens": 3410709,
+      "estimatedCost": 73.11244300000008,
+      "billedCost": 0,
+      "unpricedRequests": 0
+    }
+  ],
+  "quotaSamples": [],
+  "totals": {
+    "requests": 1033,
+    "inputTokens": 2092,
+    "outputTokens": 817459,
+    "reasoningTokens": 0,
+    "cacheReadTokens": 198738282,
+    "cacheWriteTokens": 3426258,
+    "estimatedCost": 73.11244300000008,
+    "billedCost": 0,
+    "unpricedRequests": 3
+  }
+}
