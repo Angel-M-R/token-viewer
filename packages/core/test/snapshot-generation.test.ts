@@ -130,6 +130,71 @@ describe("daily snapshot generation", () => {
     expect(await inputTokens(root, "2026-07-26")).toBe(99);
   });
 
+  it("repairs a closed day whose snapshot was generated before that day ended", async () => {
+    const root = await temporaryRoot();
+    await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [record("morning", "2026-07-24T07:00:00.000Z")],
+      pricing: PRICING,
+      now: new Date("2026-07-24T07:30:00.000Z"),
+    });
+
+    const result = await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [
+        record("morning", "2026-07-24T07:00:00.000Z"),
+        record("evening", "2026-07-24T18:00:00.000Z", 50),
+        record("closed", "2026-07-25T10:00:00.000Z"),
+      ],
+      pricing: PRICING,
+      now: new Date("2026-07-27T08:00:00.000Z"),
+    });
+
+    expect(result.writtenDates).toEqual(["2026-07-24", "2026-07-25"]);
+    expect(await inputTokens(root, "2026-07-24")).toBe(51);
+
+    const rerun = await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [
+        record("morning", "2026-07-24T07:00:00.000Z"),
+        record("evening", "2026-07-24T18:00:00.000Z", 50),
+        record("late", "2026-07-24T20:00:00.000Z", 7),
+        record("closed", "2026-07-25T10:00:00.000Z"),
+      ],
+      pricing: PRICING,
+      now: new Date("2026-07-28T08:00:00.000Z"),
+    });
+    expect(rerun.protectedClosedDates).toEqual(["2026-07-24", "2026-07-25"]);
+    expect(await inputTokens(root, "2026-07-24")).toBe(51);
+  });
+
+  it("never shrinks a closed day when local sources were pruned", async () => {
+    const root = await temporaryRoot();
+    await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [record("a", "2026-07-26T10:00:00.000Z", 40), record("b", "2026-07-26T11:00:00.000Z", 40)],
+      pricing: PRICING,
+      now: new Date("2026-07-26T12:00:00.000Z"),
+    });
+
+    const result = await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [record("a", "2026-07-26T10:00:00.000Z", 40)],
+      pricing: PRICING,
+      now: new Date("2026-07-27T08:00:00.000Z"),
+      repairClosedDates: ["2026-07-26"],
+    });
+
+    expect(result.writtenDates).toEqual([]);
+    expect(result.protectedClosedDates).toEqual(["2026-07-26"]);
+    expect(await inputTokens(root, "2026-07-26")).toBe(80);
+  });
+
   it("derives the open day from Europe/Madrid rather than UTC", async () => {
     const root = await temporaryRoot();
     const records = [record("boundary", "2026-07-27T22:30:00.000Z")];

@@ -139,12 +139,17 @@ export async function planDailySnapshots(
   for (const date of [...dates].sort(compareStrings)) {
     const existing = await readDailySnapshot(options.repositoryRoot, options.machine, date);
     const isClosed = date < openDate;
-    if (existing && isClosed && !repairDates.has(date)) {
+    const aggregate = aggregates.get(date) ?? emptyDailyAggregate(date);
+    if (
+      existing &&
+      isClosed &&
+      ((!repairDates.has(date) && !isPartialSnapshot(existing)) ||
+        totalTokens(aggregate.totals) < totalTokens(existing.totals))
+    ) {
       protectedClosedDates.push(date);
       continue;
     }
 
-    const aggregate = aggregates.get(date) ?? emptyDailyAggregate(date);
     const baseSnapshot: DailySnapshot = {
       schemaVersion: SNAPSHOT_SCHEMA_VERSION,
       machine: options.machine,
@@ -219,6 +224,25 @@ async function snapshotExists(
       throw error;
     }),
   );
+}
+
+/**
+ * A snapshot generated before its local day ended only captured part of that day.
+ * Such snapshots stay repairable after the day closes, even when the publisher
+ * did not run on the following day.
+ */
+function isPartialSnapshot(snapshot: DailySnapshot): boolean {
+  const generatedDate = localSnapshotDate(snapshot.generatedAt);
+  return generatedDate !== null && generatedDate <= snapshot.date;
+}
+
+/**
+ * Closed days never shrink: local agent logs are pruned over time, so a lower
+ * recount means missing sources rather than corrected usage.
+ */
+function totalTokens(totals: SnapshotTotals | undefined): number {
+  if (!totals) return 0;
+  return totals.inputTokens + totals.outputTokens + totals.cacheReadTokens + totals.cacheWriteTokens;
 }
 
 function emptyDailyAggregate(date: string): DailyUsageAggregate {
