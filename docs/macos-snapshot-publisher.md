@@ -30,13 +30,13 @@ pnpm --dir "$CHECKOUT" --filter collector exec tsx src/cli.ts init \
   --expected-remote-url "$EXPECTED_REMOTE"
 ```
 
-Review the rendered plist without writing or loading it, then install the daily 09:00 local-time job:
+Review the rendered plist without writing or loading it, then install the daily 10:00 local-time job:
 
 ```sh
 node "$CHECKOUT/ops/macos/install-launchd.mjs" \
-  --machine angel-mac --checkout "$CHECKOUT" --hour 9 --minute 0 --dry-run
+  --machine angel-mac --checkout "$CHECKOUT" --hour 10 --minute 0 --dry-run
 node "$CHECKOUT/ops/macos/install-launchd.mjs" \
-  --machine angel-mac --checkout "$CHECKOUT" --hour 9 --minute 0
+  --machine angel-mac --checkout "$CHECKOUT" --hour 10 --minute 0
 ```
 
 The installer refuses a non-`master`, dirty, nested, wrong-origin, or mismatched collector checkout.
@@ -106,13 +106,13 @@ pnpm --dir "$CHECKOUT" --filter collector exec tsx src/cli.ts init \
   --expected-remote-url "$EXPECTED_REMOTE"
 ```
 
-Review the rendered plist without writing or loading it, then install the daily 09:00 local-time job:
+Review the rendered plist without writing or loading it, then install the daily 10:00 local-time job:
 
 ```sh
 node "$CHECKOUT/ops/macos/install-launchd.mjs" \
-  --machine mac-m5 --checkout "$CHECKOUT" --hour 9 --minute 0 --dry-run
+  --machine mac-m5 --checkout "$CHECKOUT" --hour 10 --minute 0 --dry-run
 node "$CHECKOUT/ops/macos/install-launchd.mjs" \
-  --machine mac-m5 --checkout "$CHECKOUT" --hour 9 --minute 0
+  --machine mac-m5 --checkout "$CHECKOUT" --hour 10 --minute 0
 ```
 
 The installer refuses a non-`master`, dirty, nested, wrong-origin, or mismatched collector checkout.
