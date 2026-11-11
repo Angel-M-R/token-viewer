@@ -144,7 +144,7 @@ export async function planDailySnapshots(
       existing &&
       isClosed &&
       ((!repairDates.has(date) && !isPartialSnapshot(existing)) ||
-        totalTokens(aggregate.totals) < totalTokens(existing.totals))
+        totalTokens(aggregate.totals) < snapshotTotalTokens(existing))
     ) {
       protectedClosedDates.push(date);
       continue;
@@ -240,9 +240,20 @@ function isPartialSnapshot(snapshot: DailySnapshot): boolean {
  * Closed days never shrink: local agent logs are pruned over time, so a lower
  * recount means missing sources rather than corrected usage.
  */
-function totalTokens(totals: SnapshotTotals | undefined): number {
-  if (!totals) return 0;
-  return totals.inputTokens + totals.outputTokens + totals.cacheReadTokens + totals.cacheWriteTokens;
+function snapshotTotalTokens(snapshot: DailySnapshot): number {
+  return snapshot.totals
+    ? totalTokens(snapshot.totals)
+    : snapshot.usage.reduce((total, row) => total + totalTokens(row), 0);
+}
+
+function totalTokens(totals: SnapshotTotals): number {
+  return (
+    totals.inputTokens +
+    totals.outputTokens +
+    totals.reasoningTokens +
+    totals.cacheReadTokens +
+    totals.cacheWriteTokens
+  );
 }
 
 function emptyDailyAggregate(date: string): DailyUsageAggregate {

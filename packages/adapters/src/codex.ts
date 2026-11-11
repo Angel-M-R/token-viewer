@@ -3,6 +3,7 @@ import { basename } from "node:path";
 import {
   codexRoots,
   type Adapter,
+  type HashableUsageRecord,
   type UsageOptions,
   type UsageRecord,
 } from "@tokenviewer/core";
@@ -23,6 +24,14 @@ interface CodexTokenUsage {
   totalTokens: number;
 }
 
+interface CanonicalCodexUsage {
+  responseId: string;
+  turnId: string;
+  session?: string;
+  timestamp: string;
+  usage: CodexTokenUsage;
+}
+
 export function codexAdapter(): Adapter {
   return {
     name: "codex",
@@ -36,8 +45,9 @@ export function codexAdapter(): Adapter {
     },
     async *usage(options?: UsageOptions): AsyncGenerator<UsageRecord> {
       const seenUsage = new Set<string>();
+      const seenResponses = new Set<string>();
       for await (const filePath of discoverCodexSessionFiles()) {
-        for await (const record of parseCodexUsageJsonl(filePath, options)) {
+        for await (const record of parseCodexUsageJsonl(filePath, seenResponses, options)) {
           if (seenUsage.has(record.recordHash)) {
             continue;
           }
@@ -57,10 +67,20 @@ async function* discoverCodexSessionFiles(): AsyncGenerator<string> {
 
 async function* parseCodexUsageJsonl(
   filePath: string,
+  seenResponses: Set<string>,
   options?: UsageOptions,
 ): AsyncGenerator<UsageRecord> {
-  const lines = await readCompleteJsonlLines(filePath, options);
+  const appendedLines = await readCompleteJsonlLines(filePath, options);
+  const firstNewLine = appendedLines[0]?.lineNumber;
+  if (firstNewLine === undefined) return;
+  // Incremental reads still need earlier context and response mirrors to interpret
+  // an appended counter correctly. Only newly appended records are emitted below.
+  const lines = firstNewLine > 1
+    ? await readCompleteJsonlLines(filePath, { full: true })
+    : appendedLines;
+  const canonicalMirrors = findCanonicalMirrors(lines);
   let model: string | undefined;
+  let contextIndex = 0;
   let previousTotal: CodexTokenUsage | null = null;
   let previousUsageSignature: string | null = null;
   let session = sessionFromRolloutFileName(basename(filePath));
@@ -82,6 +102,31 @@ async function* parseCodexUsageJsonl(
 
       if (entry["type"] === "turn_context") {
         model = stringValue(payload?.["model"]) ?? model;
+        contextIndex += 1;
+        continue;
+      }
+
+      if (entry["type"] === "token_usage_record") {
+        const canonical = parseCanonicalUsage(entry);
+        if (!canonical) {
+          const usage = parseCodexTokenUsage(payload?.["usage"]);
+          if (!usage || hasBillableUsage(usage)) {
+            options?.onWarning?.("codex: unsupported token_usage_record; retaining legacy counter fallback");
+          }
+          continue;
+        }
+        if (!isAtOrAfter(canonical.timestamp, options?.since) || seenResponses.has(canonical.responseId)) {
+          continue;
+        }
+        seenResponses.add(canonical.responseId);
+        if (lineNumber < firstNewLine) continue;
+        yield codexUsageRecord(canonical.usage, {
+          model,
+          timestamp: canonical.timestamp,
+          session: canonical.session ?? session,
+          sourceFile: filePath,
+          nativeId: `response:${canonical.responseId}`,
+        });
         continue;
       }
 
@@ -121,23 +166,25 @@ async function* parseCodexUsageJsonl(
       }
 
       const timestamp = stringValue(entry["timestamp"]);
+      const mirror = canonicalMirrors.get(mirrorKey(contextIndex, usage))?.shift();
+      if (mirror) {
+        // A legacy-first response may already have been counted in an earlier
+        // incremental scan before its canonical record was appended.
+        if (lineNumber < firstNewLine && isAtOrAfter(timestamp, options?.since)) {
+          seenResponses.add(mirror.responseId);
+        }
+        continue;
+      }
+      if (lineNumber < firstNewLine) continue;
       if (!isAtOrAfter(timestamp, options?.since)) {
         continue;
       }
 
-      const reasoningTokens = Math.min(usage.reasoningOutputTokens, usage.outputTokens);
       const nativeId = `${session}:${timestamp ?? ""}:${lineNumber}:${codexUsageSignature(usage, total)}`;
-      yield withRecordHash({
-        agent: "codex",
-        provider: "openai",
+      yield codexUsageRecord(usage, {
         model,
         timestamp,
         session,
-        inputTokens: Math.max(usage.inputTokens - usage.cachedInputTokens, 0),
-        outputTokens: Math.max(usage.outputTokens - reasoningTokens, 0),
-        reasoningTokens,
-        cacheReadTokens: usage.cachedInputTokens,
-        cacheWriteTokens: 0,
         sourceFile: filePath,
         nativeId,
       });
@@ -145,6 +192,68 @@ async function* parseCodexUsageJsonl(
       options?.onFileSkipped?.(filePath, "malformed");
     }
   }
+}
+
+// Suppress one matching legacy response per canonical record, rather than an entire
+// turn. Missing or malformed canonical responses must leave legacy usage recoverable.
+// Context boundaries separate responses even when older contexts have no turn_id.
+function findCanonicalMirrors(lines: readonly { line: string }[]): Map<string, CanonicalCodexUsage[]> {
+  const mirrors = new Map<string, CanonicalCodexUsage[]>();
+  let contextIndex = 0;
+  for (const { line } of lines) {
+    if (!line.includes("token_usage_record") && !line.includes("turn_context")) continue;
+    try {
+      const entry = JSON.parse(line) as Record<string, unknown>;
+      if (entry["type"] === "turn_context") contextIndex += 1;
+      const canonical = parseCanonicalUsage(entry);
+      if (canonical) {
+        const key = mirrorKey(contextIndex, canonical.usage);
+        const responses = mirrors.get(key) ?? [];
+        responses.push(canonical);
+        mirrors.set(key, responses);
+      }
+    } catch {
+      // The main pass reports malformed JSON once.
+    }
+  }
+  return mirrors;
+}
+
+function mirrorKey(contextIndex: number, usage: CodexTokenUsage): string {
+  return `${contextIndex}:${codexUsageSignature(usage, null)}`;
+}
+
+function parseCanonicalUsage(entry: Record<string, unknown>): CanonicalCodexUsage | null {
+  if (entry["type"] !== "token_usage_record") return null;
+  const payload = asRecord(entry["payload"]);
+  const usage = parseCodexTokenUsage(payload?.["usage"]);
+  const responseId = stringValue(payload?.["response_id"]);
+  const turnId = stringValue(payload?.["turn_id"]);
+  const timestamp = stringValue(entry["timestamp"]);
+  if (!usage || !hasBillableUsage(usage) || !responseId || !turnId || !timestamp || !Number.isFinite(Date.parse(timestamp))) {
+    return null;
+  }
+  return {
+    usage, responseId, turnId, timestamp,
+    session: stringValue(payload?.["thread_id"]) ?? stringValue(payload?.["session_id"]),
+  };
+}
+
+function codexUsageRecord(
+  usage: CodexTokenUsage,
+  source: Pick<HashableUsageRecord, "model" | "timestamp" | "session" | "sourceFile" | "nativeId">,
+): UsageRecord {
+  const reasoningTokens = Math.min(usage.reasoningOutputTokens, usage.outputTokens);
+  return withRecordHash({
+    agent: "codex",
+    provider: "openai",
+    ...source,
+    inputTokens: Math.max(usage.inputTokens - usage.cachedInputTokens, 0),
+    outputTokens: Math.max(usage.outputTokens - reasoningTokens, 0),
+    reasoningTokens,
+    cacheReadTokens: usage.cachedInputTokens,
+    cacheWriteTokens: 0,
+  });
 }
 
 function sessionFromRolloutFileName(fileName: string): string {

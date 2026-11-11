@@ -1,4 +1,4 @@
-import { mkdtemp, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -70,6 +70,29 @@ describe.sequential("JSONL cursor handling", () => {
 });
 
 describe.sequential("claude adapter", () => {
+  it.sequential("collects nested workflow subagents as well as direct subagents", async () => {
+    const root = await mkdtemp(join(tmpdir(), "tv-claude-workflows-"));
+    process.env.CLAUDE_CONFIG_DIR = root;
+    const subagents = join(root, "projects", "my-project", "session-1", "subagents");
+    for (const [path, messageId] of [
+      [join(subagents, "agent-direct.jsonl"), "msg-direct"],
+      [join(subagents, "workflows", "run-1", "agent-nested.jsonl"), "msg-nested"],
+    ] as const) {
+      await mkdir(join(path, ".."), { recursive: true });
+      await writeFile(path, `${JSON.stringify({
+        type: "assistant", timestamp: "2026-10-15T10:00:00.000Z",
+        message: { id: messageId, role: "assistant", model: "claude-opus-5-5", usage: { input_tokens: 10, output_tokens: 5 } },
+      })}\n`);
+    }
+
+    const records = [];
+    for await (const record of claudeAdapter().usage({ full: true })) records.push(record);
+    expect(records.map((record) => record.session).sort()).toEqual([
+      "session-1/agent-direct", "session-1/workflows/run-1/agent-nested",
+    ]);
+    expect(records.reduce((sum, record) => sum + record.inputTokens + record.outputTokens, 0)).toBe(30);
+  });
+
   it.sequential("deduplicates streaming usage by request and emits source metadata", async () => {
     const root = await mkdtemp(join(tmpdir(), "tv-claude-"));
     process.env.CLAUDE_CONFIG_DIR = root;

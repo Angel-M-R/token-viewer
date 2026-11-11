@@ -94,7 +94,7 @@ function parseOptions(argv) {
   const options = {
     machine: undefined,
     checkout: undefined,
-    hour: 9,
+    hour: 10,
     minute: 0,
     path: DEFAULT_PATH,
     dryRun: false,
@@ -208,6 +208,6 @@ async function runLaunchctl(args, ignoreFailure = false) {
 
 function printUsage() {
   process.stdout.write(`Usage:
-  node ops/macos/install-launchd.mjs --machine <angel-mac|mac-m5> --checkout <absolute-path> [--hour 9] [--minute 0] [--path <PATH>] [--dry-run]
+  node ops/macos/install-launchd.mjs --machine <angel-mac|mac-m5> --checkout <absolute-path> [--hour 10] [--minute 0] [--path <PATH>] [--dry-run]
 `);
 }

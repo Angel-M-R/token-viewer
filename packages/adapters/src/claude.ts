@@ -1,12 +1,12 @@
 import { readdir, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import {
   claudeProjectsDir,
   type Adapter,
   type UsageOptions,
   type UsageRecord,
 } from "@tokenviewer/core";
-import { readCompleteJsonlLines } from "./source-files.js";
+import { readCompleteJsonlLines, walkFiles } from "./source-files.js";
 import {
   asRecord,
   isAtOrAfter,
@@ -60,11 +60,10 @@ async function* discoverClaudeJsonlFiles(): AsyncGenerator<ClaudeFile> {
 
       if (entryStat?.isDirectory()) {
         const subagentsDir = join(entryPath, "subagents");
-        const subagentFiles = await readdir(subagentsDir).catch(() => []);
-        for (const subagentFile of subagentFiles.filter((file) => file.endsWith(".jsonl"))) {
+        for await (const subagentPath of walkFiles(subagentsDir, (file) => file.endsWith(".jsonl"))) {
           yield {
-            filePath: join(subagentsDir, subagentFile),
-            session: `${entry}/${subagentFile.replace(/\.jsonl$/, "")}`,
+            filePath: subagentPath,
+            session: `${entry}/${relative(subagentsDir, subagentPath).replace(/\.jsonl$/, "")}`,
             project: projectDir,
           };
         }

@@ -27,6 +27,27 @@ Use this procedure only in the affected active machine's dedicated `master` chec
 
 4. Confirm every changed or pending path is under `snapshots/$MACHINE/`. Stop and escalate if another machine folder or any non-snapshot path appears.
 
+## Partial or missing days
+
+After updating and rebuilding the collector, preview a full historical repair in the affected machine's dedicated checkout:
+
+```sh
+pnpm --dir "$CHECKOUT" --filter collector... build
+pnpm --dir "$CHECKOUT" --filter collector exec node dist/cli.js run --dry-run --repair-all \
+  --out "$HOME/Library/Logs/TokenViewer/$MACHINE-repair-preview.json"
+```
+
+Review `writtenDates`, the per-day totals in `days`, `protectedClosedDates`, `warnings`, and `skippedRecords`. A normal run already repairs snapshots generated before their local day ended. `--repair-all` also recounts closed days previously generated after the day ended. Closed days with a lower recount, including reasoning tokens, remain unchanged because the available local sources may be incomplete. Records without a valid timestamp cannot be assigned to a day and are counted in `skippedRecords`.
+
+Once the preview is checked, publish the repair with bounded SSH connection and idle waits:
+
+```sh
+GIT_SSH_COMMAND='ssh -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=2' \
+  pnpm --dir "$CHECKOUT" --filter collector exec node dist/cli.js run --publish --repair-all
+```
+
+Publication recovers any preserved unpublished commit before generating the repair, validates the complete snapshot set, and writes only the configured machine's folder. Repeat the procedure on each active machine using that machine's local logs. Keep `old-mac` read-only. After a successful publication, verify the pending commit range is empty and reload the scheduled job.
+
 ## Invalid snapshot data
 
 Run whole-set and fixture validation without displaying file contents:

@@ -195,6 +195,64 @@ describe("daily snapshot generation", () => {
     expect(await inputTokens(root, "2026-07-26")).toBe(80);
   });
 
+  it("preserves closed snapshots without optional precomputed totals when sources were pruned", async () => {
+    const root = await temporaryRoot();
+    await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [record("a", "2026-07-24T10:00:00.000Z", 40), record("b", "2026-07-24T11:00:00.000Z", 40)],
+      pricing: PRICING,
+      now: new Date("2026-07-24T12:00:00.000Z"),
+    });
+    const snapshotPath = join(root, "snapshots/angel-mac/2026/07/2026-07-24.json");
+    const snapshot = JSON.parse(await readFile(snapshotPath, "utf8"));
+    delete snapshot.totals;
+    const original = JSON.stringify(snapshot);
+    await writeFile(snapshotPath, original, "utf8");
+
+    const result = await generateDailySnapshots({
+      repositoryRoot: root,
+      machine: "angel-mac",
+      records: [record("a", "2026-07-24T10:00:00.000Z", 40)],
+      pricing: PRICING,
+      now: new Date("2026-07-27T08:00:00.000Z"),
+      repairClosedDates: ["2026-07-24"],
+    });
+
+    expect(result.writtenDates).toEqual([]);
+    expect(result.protectedClosedDates).toEqual(["2026-07-24"]);
+    expect(await readFile(snapshotPath, "utf8")).toBe(original);
+  });
+
+  it.each([false, true])(
+    "preserves a closed day when pruned reasoning outweighs added input, explicit repair: %s",
+    async (explicitRepair) => {
+      const root = await temporaryRoot();
+      await generateDailySnapshots({
+        repositoryRoot: root,
+        machine: "angel-mac",
+        records: [{ ...record("original", "2026-07-24T10:00:00.000Z"), reasoningTokens: 100 }],
+        pricing: PRICING,
+        now: new Date("2026-07-24T12:00:00.000Z"),
+      });
+      const snapshotPath = join(root, "snapshots/angel-mac/2026/07/2026-07-24.json");
+      const original = await readFile(snapshotPath, "utf8");
+
+      const result = await generateDailySnapshots({
+        repositoryRoot: root,
+        machine: "angel-mac",
+        records: [{ ...record("recount", "2026-07-24T10:00:00.000Z", 2), reasoningTokens: 0 }],
+        pricing: PRICING,
+        now: new Date("2026-07-27T08:00:00.000Z"),
+        repairClosedDates: explicitRepair ? ["2026-07-24"] : undefined,
+      });
+
+      expect(result.writtenDates).toEqual([]);
+      expect(result.protectedClosedDates).toEqual(["2026-07-24"]);
+      expect(await readFile(snapshotPath, "utf8")).toBe(original);
+    },
+  );
+
   it("derives the open day from Europe/Madrid rather than UTC", async () => {
     const root = await temporaryRoot();
     const records = [record("boundary", "2026-07-27T22:30:00.000Z")];
