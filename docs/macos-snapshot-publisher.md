@@ -41,6 +41,7 @@ node "$CHECKOUT/ops/macos/install-launchd.mjs" \
 
 The installer refuses a non-`master`, dirty, nested, wrong-origin, or mismatched collector checkout.
 Each daily run pulls and rebases `master`, rebuilds the collector and its compiled workspace dependencies, and only then starts snapshot publication.
+If any step fails, the run retries up to three times with growing waits: first with the user's SSH configuration, then forcing `ssh.github.com:443`, then `github.com:22`, so networks that intermittently reset one SSH port do not lose the day's publication. A `GIT_SSH_COMMAND` set in the job environment is used for every attempt instead.
 
 ### Status and logs
 
@@ -117,6 +118,7 @@ node "$CHECKOUT/ops/macos/install-launchd.mjs" \
 
 The installer refuses a non-`master`, dirty, nested, wrong-origin, or mismatched collector checkout.
 Each daily run pulls and rebases `master`, rebuilds the collector and its compiled workspace dependencies, and only then starts snapshot publication.
+If any step fails, the run retries up to three times with growing waits: first with the user's SSH configuration, then forcing `ssh.github.com:443`, then `github.com:22`, so networks that intermittently reset one SSH port do not lose the day's publication. A `GIT_SSH_COMMAND` set in the job environment is used for every attempt instead.
 
 ### Status and logs
 

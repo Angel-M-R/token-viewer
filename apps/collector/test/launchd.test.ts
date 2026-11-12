@@ -180,6 +180,71 @@ describe.sequential("launchd installer", () => {
       `pnpm:--dir ${canonicalCheckout} --filter collector run publish`,
     ]);
   });
+
+  it("retries a failed run through alternate GitHub SSH endpoints", async () => {
+    const root = await mkdtemp(join(tmpdir(), "tv-daily-runner-retry-"));
+    temporaryRoots.push(root);
+    const checkout = join(root, "operational checkout");
+    const fakeBin = join(root, "bin");
+    const commandLog = join(root, "commands.log");
+    const failures = join(root, "failures");
+    await mkdir(checkout, { recursive: true });
+    await mkdir(fakeBin, { recursive: true });
+    await writeFile(failures, "2", "utf8");
+    await writeFile(
+      join(fakeBin, "git"),
+      [
+        "#!/bin/sh",
+        `printf 'git:%s\\n' "$GIT_SSH_COMMAND" >> "$COMMAND_LOG"`,
+        `left=$(cat "$FAILURES")`,
+        `if [ "$left" -gt 0 ]; then echo $((left - 1)) > "$FAILURES"; echo "Connection reset by peer" >&2; exit 1; fi`,
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    await writeFile(join(fakeBin, "pnpm"), `#!/bin/sh\nprintf 'pnpm:%s\\n' "$*" >> "$COMMAND_LOG"\n`, "utf8");
+    await chmod(join(fakeBin, "git"), 0o755);
+    await chmod(join(fakeBin, "pnpm"), 0o755);
+    const { GIT_SSH_COMMAND: _ignored, ...env } = process.env;
+
+    const result = await execFile(process.execPath, [dailyRunner, "--checkout", checkout], {
+      cwd: repositoryRoot,
+      env: {
+        ...env,
+        PATH: `${fakeBin}:${process.env.PATH ?? ""}`,
+        COMMAND_LOG: commandLog,
+        FAILURES: failures,
+        TOKENVIEWER_RETRY_DELAY_MS: "0",
+      },
+    });
+
+    const gitCalls = (await readFile(commandLog, "utf8")).trim().split("\n").filter((line) => line.startsWith("git:"));
+    expect(gitCalls).toHaveLength(3);
+    expect(gitCalls[0]).not.toContain("HostName=");
+    expect(gitCalls[1]).toContain("-o HostName=ssh.github.com -o Port=443 -o HostKeyAlias=github.com");
+    expect(gitCalls[2]).toContain("-o HostName=github.com -o Port=22");
+    expect(result.stderr).toContain("attempt 3 (github.com:22) succeeded");
+  });
+
+  it("gives up after the last SSH endpoint fails", async () => {
+    const root = await mkdtemp(join(tmpdir(), "tv-daily-runner-exhausted-"));
+    temporaryRoots.push(root);
+    const checkout = join(root, "operational checkout");
+    const fakeBin = join(root, "bin");
+    await mkdir(checkout, { recursive: true });
+    await mkdir(fakeBin, { recursive: true });
+    await writeFile(join(fakeBin, "git"), "#!/bin/sh\necho 'Operation timed out' >&2\nexit 1\n", "utf8");
+    await chmod(join(fakeBin, "git"), 0o755);
+
+    const failure = await execFile(process.execPath, [dailyRunner, "--checkout", checkout], {
+      cwd: repositoryRoot,
+      env: { ...process.env, PATH: `${fakeBin}:${process.env.PATH ?? ""}`, TOKENVIEWER_RETRY_DELAY_MS: "0" },
+    }).then(() => null, (error: { code?: number; stderr?: string }) => error);
+
+    expect(failure?.code).toBe(1);
+    expect(failure?.stderr).toContain("attempt 2 (ssh.github.com:443) failed");
+    expect(failure?.stderr).toMatch(/git -C failed: Operation timed out\n$/);
+  });
 });
 
 async function exists(path: string): Promise<boolean> {
